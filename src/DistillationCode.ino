@@ -25,7 +25,7 @@
 //-------------------------------------------------------------------------------------
 //
 // Settling time (number of samples) and data filtering can be adjusted in the HX711_ADC.h file
-//Testing this change
+// Were going to make some changes and see how this works
 
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Libraries and Variables-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
