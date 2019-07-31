@@ -3,8 +3,8 @@
 // Code measures the Frequency of a charge build up in a capcaitor from the output of a 555 timer. (See Distilation capstone project)
 // Code measures the Temperature from 2 DS18B20S
 // Code measures the Weight applied to the load cell
-//  Combining the Frequency and Temperature circuits requires putting a diode in series with the 5V supply to the 555 timer circuit to prevent
-//  back inductance from the 555 timer cicuit ruining the readings across the DS18B20 temperature probes.
+// Combining the Frequency and Temperature circuits requires putting a diode in series with the 5V supply to the 555 timer circuit to prevent
+// back inductance from the 555 timer cicuit ruining the readings across the DS18B20 temperature probes.
 
 
 //-------------------------------------------------------555 Circuit Timer---------------------------------------------------------////
