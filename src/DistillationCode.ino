@@ -1,32 +1,3 @@
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Notes-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
-
-// Code measures the Frequency of a charge build up in a capcaitor from the output of a 555 timer. (See Distilation capstone project)
-// Code measures the Temperature from 2 DS18B20S
-// Code measures the Weight applied to the load cell
-// Combining the Frequency and Temperature circuits requires putting a diode in series with the 5V supply to the 555 timer circuit to prevent
-// back inductance from the 555 timer cicuit ruining the readings across the DS18B20 temperature probes.
-
-
-//-------------------------------------------------------555 Circuit Timer---------------------------------------------------------////
-// ** 555 timer circuit adapted from: http://www.fiz-ix.com/2012/11/measuring-signal-frequency-with-arduino/
-
-
-//-------------------------------------------------------PID CONTROL--------------------------------------------------------------////
-//  PID CONTROL adapted from : http://electronoobs.com/eng_arduino_tut24_sch2.php
-
-
-//-------------------------------------------------------Load Cell----------------------------------------------------------------////
-//-------------------------------------------------------------------------------------
-// HX711_ADC.h
-// Arduino master library for HX711 24-Bit Analog-to-Digital Converter for Weight Scales
-// Olav Kallhovd sept2017
-// Tested with      : HX711 asian module on channel A and YZC-133 3kg load cell
-// Tested with MCU  : Arduino Nano
-//-------------------------------------------------------------------------------------
-//
-// Settling time (number of samples) and data filtering can be adjusted in the HX711_ADC.h file
-
-
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Libraries and Variables-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
@@ -52,6 +23,7 @@ DeviceAddress tempOnPin10 = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 float towerTemp = 0.0; float washTemp = 0.0; float someTemp1 = 0.0; float someTemp2 = 0.0;
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
+int temperatureResolution = 12; // set the DS18B20 resolution to 9,10,11,12 (# of bits)
 float PID_error = 0.0;
 float previous_error = 0.0;
 float elapsedTime, Time, timePrev, timeLeft;
@@ -93,7 +65,7 @@ float epsilon = 0.0;
 float constant_F = 4500000.0;
 float constant_T = 0.3;
 int tempAnomolyCounter = 0;
-
+int state = 0;
 
 //-----------------------------------------------------------Function Variable----------------------------------------------------------------////
 //Averaging Function Variables
@@ -111,11 +83,11 @@ void setup() {
   //-----------------------------------------------------------Temperature---------------------------------------------------------////
   // Start up the temperature library
   tempSensors.begin();
-  tempSensors.setResolution(tempOnPin13, 12); // set the DS18B20 resolution to 9,10,11,12
-  tempSensors.setResolution(tempOnPin12, 12);
-  tempSensors.setResolution(tempOnPin11, 12);
-  tempSensors.setResolution(tempOnPin10, 12);
-
+  /* // Uncomment this section when the resolution of the DS18B20S is going to change.
+  tempSensors.setResolution(tempOnPin13, temperatureResolution);
+  tempSensors.setResolution(tempOnPin12, temperatureResolution);
+  tempSensors.setResolution(tempOnPin11, temperatureResolution);
+  tempSensors.setResolution(tempOnPin10, temperatureResolution);
   // confirm that we set that resolution by asking the DS18B20 to repeat it back
   Serial.print("Sensor 13 Resolution: ");
   Serial.println(tempSensors.getResolution(tempOnPin13), DEC);
@@ -125,7 +97,7 @@ void setup() {
   Serial.println(tempSensors.getResolution(tempOnPin11), DEC);
   Serial.print("Sensor 10 Resolution: ");
   Serial.println(tempSensors.getResolution(tempOnPin10), DEC);
-
+  */
 
   //PID temperature control
   pinMode(PWM_pin, OUTPUT);
@@ -266,6 +238,7 @@ void loop() {
   // Wait for the massRate to begin (massRate > minMassRate)
   if (massRate > minMassRate & checkpoint == checkpointConst) {
     checkpoint = time + checkpointIncrement;
+    state = 1;
   }
   // After the distillation has started, increment the tower temperature if the flow rate becomes too slow (ie. massRate < minMassRate)
   // and we have waited sufficiently long (ie the "time" has passed the "checkpoint" we set in the above (time > checkpoint))
@@ -291,8 +264,12 @@ void loop() {
 
   Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
   Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
-  Serial.print("F");            Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
-  Serial.print("tErr");         Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.println("\t");
+  Serial.print("F:");           Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
+  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+  if (tempAnomolyCounter > 10) {
+    Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.println("\t");
+  }
+
 
   //Serial.print("Epsilon");    Serial.print("\t");   Serial.println(epsilon);                Serial.print("\t");
 
