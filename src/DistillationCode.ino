@@ -111,6 +111,21 @@ void setup() {
   //-----------------------------------------------------------Temperature---------------------------------------------------------////
   // Start up the temperature library
   tempSensors.begin();
+  tempSensors.setResolution(tempOnPin13, 12); // set the DS18B20 resolution to 9,10,11,12
+  tempSensors.setResolution(tempOnPin12, 12);
+  tempSensors.setResolution(tempOnPin11, 12);
+  tempSensors.setResolution(tempOnPin10, 12);
+
+  // confirm that we set that resolution by asking the DS18B20 to repeat it back
+  Serial.print("Sensor 13 Resolution: ");
+  Serial.println(tempSensors.getResolution(tempOnPin13), DEC);
+  Serial.print("Sensor 12 Resolution: ");
+  Serial.println(tempSensors.getResolution(tempOnPin12), DEC);
+  Serial.print("Sensor 11 Resolution: ");
+  Serial.println(tempSensors.getResolution(tempOnPin11), DEC);
+  Serial.print("Sensor 10 Resolution: ");
+  Serial.println(tempSensors.getResolution(tempOnPin10), DEC);
+
 
   //PID temperature control
   pinMode(PWM_pin, OUTPUT);
@@ -123,7 +138,6 @@ void setup() {
   long stabilisingtime = 8000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
-  Serial.println("Startup + tare is complete");
 
   //-----------------------------------------------------------Frequency-----------------------------------------------------------////
   TCCR1A = 0; //initialize Timer1
@@ -248,11 +262,13 @@ void loop() {
     Serial.println("Tare complete");
   }
 
-  //Increment the tower temperature if the mass flow rate falls below a certain level
+  // Initial check(need to make sure checkpoint = checkpointConst at the start of the distillation) to start the checkpoint timer.
+  // Wait for the massRate to begin (massRate > minMassRate)
   if (massRate > minMassRate & checkpoint == checkpointConst) {
     checkpoint = time + checkpointIncrement;
   }
-
+  // After the distillation has started, increment the tower temperature if the flow rate becomes too slow (ie. massRate < minMassRate)
+  // and we have waited sufficiently long (ie the "time" has passed the "checkpoint" we set in the above (time > checkpoint))
   if (massRate < minMassRate & time > checkpoint) {
     set_temperature += 1;
     checkpoint = time + checkpointIncrement;
@@ -262,8 +278,8 @@ void loop() {
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
 
                                                       Serial.print(time);                   Serial.print("\t");
-  Serial.print("T°:");       Serial.print("\t");   Serial.print(towerTemp);              Serial.print("\t");
-  Serial.print("W°:");        Serial.print("\t");   Serial.print(washTemp);               Serial.print("\t");
+  Serial.print("T°:");          Serial.print("\t");   Serial.print(towerTemp);              Serial.print("\t");
+  Serial.print("W°:");          Serial.print("\t");   Serial.print(washTemp);               Serial.print("\t");
   Serial.print("1°:");          Serial.print("\t");   Serial.print(someTemp1);              Serial.print("\t");
   Serial.print("2°:");          Serial.print("\t");   Serial.print(someTemp2);              Serial.print("\t");
 
@@ -274,9 +290,9 @@ void loop() {
   Serial.print("D:");           Serial.print("\t");   Serial.print(PID_d);                  Serial.print("\t");
 
   Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
-  Serial.print("ΔM: ");      Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
+  Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
   Serial.print("F");            Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
-  Serial.print("tErr");    Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.println("\t");
+  Serial.print("tErr");         Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.println("\t");
 
   //Serial.print("Epsilon");    Serial.print("\t");   Serial.println(epsilon);                Serial.print("\t");
 
