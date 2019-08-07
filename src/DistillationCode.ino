@@ -82,21 +82,6 @@ void setup() {
   //-----------------------------------------------------------Temperature---------------------------------------------------------////
   // Start up the temperature library
   tempSensors.begin();
-  /* // Uncomment this section when the resolution of the DS18B20S is going to change.
-  tempSensors.setResolution(tempOnPin13, temperatureResolution);
-  tempSensors.setResolution(tempOnPin12, temperatureResolution);
-  tempSensors.setResolution(tempOnPin11, temperatureResolution);
-  tempSensors.setResolution(tempOnPin10, temperatureResolution);
-  // confirm that we set that resolution by asking the DS18B20 to repeat it back
-  Serial.print("Sensor 13 Resolution: ");
-  Serial.println(tempSensors.getResolution(tempOnPin13), DEC);
-  Serial.print("Sensor 12 Resolution: ");
-  Serial.println(tempSensors.getResolution(tempOnPin12), DEC);
-  Serial.print("Sensor 11 Resolution: ");
-  Serial.println(tempSensors.getResolution(tempOnPin11), DEC);
-  Serial.print("Sensor 10 Resolution: ");
-  Serial.println(tempSensors.getResolution(tempOnPin10), DEC);
-  */
 
   //PID temperature control
   pinMode(PWM_pin, OUTPUT);
@@ -208,7 +193,6 @@ void loop() {
   LoadCell.update();
 
   //get smoothed value from data set + current calibration factor
-
   float mass = LoadCell.getData() * -1;
   t = millis();
 
@@ -272,17 +256,7 @@ void loop() {
 
   //Serial.print("Epsilon");    Serial.print("\t");   Serial.println(epsilon);                Serial.print("\t");
 
-  //Delay to make the code print only once every second
-  /*
-  time = millis() / 1000;
-  timeLeft = ((timePrev + 1) - time) / 1000;
-  delay(timeLeft);
-  */
 }
-
-
-
-
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Functions-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
