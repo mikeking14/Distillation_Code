@@ -130,14 +130,13 @@ void loop() {
   someTemp2 = tempSensors.getTempC(tempOnPin10);
   storeTemperature(towerTemp, millis());
 
-
+/*
     if (towerTemp < 15 || towerTemp > 105 || washTemp < 15 || washTemp > 105 ||
         someTemp1 < 15 || someTemp1 > 105 || someTemp2< 15 || someTemp2 > 105)
        {
          tempAnomolyCounter = tempAnomolyCounter + 1;
-         return;
        }
-
+*/
 
   //Next we calculate the error between the setpoint and the real value
   PID_error = set_temperature - towerTemp;
@@ -162,7 +161,7 @@ void loop() {
   Time = millis();                            // actual time read
   elapsedTime = (Time - timePrev) / 1000;
   //Now we can calculate the D value
-  PID_d = kd * ( 3*towerTemperature[2] - 4*towerTemperature[1] + towerTemperature[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
+  PID_d = kd * ( 3*towerTemperature[2] - 4*towerTemperature[1] + towerTemperature[0] ) / ((derivativeTime[2] - derivativeTime[0]));;
   //Final total PID value is the sum of P + I + D
   PID_value = PID_p + PID_i + PID_d;
 
@@ -257,7 +256,7 @@ void loop() {
   Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
   Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
   Serial.print("F:");           Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
-  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.print("\t");
   if (tempAnomolyCounter > 10) {
     Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.println("\t");
   }
