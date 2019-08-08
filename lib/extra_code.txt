@@ -1,0 +1,26 @@
+// Use this code to change the resolution of the DS18B20
+      // Include this in the variable declarations
+      int temperatureResolution = 12; // set the DS18B20 resolution to 9,10,11,12 (# of bits)
+
+      // Include this in the setup
+      tempSensors.setResolution(tempOnPin13, temperatureResolution);
+      tempSensors.setResolution(tempOnPin12, temperatureResolution);
+      tempSensors.setResolution(tempOnPin11, temperatureResolution);
+      tempSensors.setResolution(tempOnPin10, temperatureResolution);
+      // confirm that we set that resolution by asking the DS18B20 to repeat it back
+      Serial.print("Sensor 13 Resolution: ");
+      Serial.println(tempSensors.getResolution(tempOnPin13), DEC);
+      Serial.print("Sensor 12 Resolution: ");
+      Serial.println(tempSensors.getResolution(tempOnPin12), DEC);
+      Serial.print("Sensor 11 Resolution: ");
+      Serial.println(tempSensors.getResolution(tempOnPin11), DEC);
+      Serial.print("Sensor 10 Resolution: ");
+      Serial.println(tempSensors.getResolution(tempOnPin10), DEC);
+
+
+
+// A delay in the loop to only print once a second
+
+      time = millis() / 1000;
+      timeLeft = ((timePrev + 1) - time) / 1000;
+      delay(timeLeft);
