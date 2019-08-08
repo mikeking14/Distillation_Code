@@ -22,7 +22,7 @@ DeviceAddress tempOnPin10 = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 float towerTemp = 0.0; float washTemp = 0.0; float someTemp1 = 0.0; float someTemp2 = 0.0;
 // Store temperature
 const int numTempReadings = 3;
-float towerTemperature[numTempReadings]; // the readings from the analog input
+float PID_temperature_error[numTempReadings];
 // Derivative
 float derivativeTime[numTempReadings];
 float tempDerivative = 0.0;
@@ -128,7 +128,6 @@ void loop() {
   washTemp =  tempSensors.getTempC(tempOnPin12);
   someTemp1 = tempSensors.getTempC(tempOnPin11);
   someTemp2 = tempSensors.getTempC(tempOnPin10);
-  storeTemperature(towerTemp, millis());
 
 /*
     if (towerTemp < 15 || towerTemp > 105 || washTemp < 15 || washTemp > 105 ||
@@ -140,6 +139,8 @@ void loop() {
 
   //Next we calculate the error between the setpoint and the real value
   PID_error = set_temperature - towerTemp;
+  storeError(PID_error, millis());
+
   //Calculate the P value
   PID_p = kp * PID_error;
   //Calculate the I value in a range on +-10
@@ -161,7 +162,7 @@ void loop() {
   Time = millis();                            // actual time read
   elapsedTime = (Time - timePrev) / 1000;
   //Now we can calculate the D value
-  PID_d = kd * ( 3*towerTemperature[2] - 4*towerTemperature[1] + towerTemperature[0] ) / ((derivativeTime[2] - derivativeTime[0]));;
+  PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0]));;
   //Final total PID value is the sum of P + I + D
   PID_value = PID_p + PID_i + PID_d;
 
@@ -256,10 +257,10 @@ void loop() {
   Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
   Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
   Serial.print("F:");           Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
-  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.print("\t");
-  if (tempAnomolyCounter > 10) {
-    Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.println("\t");
-  }
+if(tempAnomolyCounter > 10)
+ {Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t"); }
+  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+
 }
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Functions-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
@@ -286,14 +287,14 @@ float calculateAverage(float input) {
 }
 
 //Store the temperature and time in a matrix
-float storeTemperature(float input, float timeMillis) {
+float storeError(float input, float timeMillis) {
   // read from the sensor:
-  towerTemperature[0] = readings[1];
+  PID_temperature_error[0] = readings[1];
   derivativeTime[0] = derivativeTime[1];
 
-  towerTemperature[1] = readings[2];
+  PID_temperature_error[1] = readings[2];
   derivativeTime[1] = derivativeTime[2];
 
-  towerTemperature[2] = input;
+  PID_temperature_error[2] = input;
   derivativeTime[2] = timeMillis;
   };
