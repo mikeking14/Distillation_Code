@@ -162,7 +162,7 @@ void loop() {
   Time = millis();                            // actual time read
   elapsedTime = (Time - timePrev) / 1000;
   //Now we can calculate the D value
-  PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0]));;
+  PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
   //Final total PID value is the sum of P + I + D
   PID_value = PID_p + PID_i + PID_d;
 
@@ -289,10 +289,10 @@ float calculateAverage(float input) {
 //Store the temperature and time in a matrix
 float storeError(float input, float timeMillis) {
   // read from the sensor:
-  PID_temperature_error[0] = readings[1];
+  PID_temperature_error[0] = PID_temperature_error[1];
   derivativeTime[0] = derivativeTime[1];
 
-  PID_temperature_error[1] = readings[2];
+  PID_temperature_error[1] = PID_temperature_error[2];
   derivativeTime[1] = derivativeTime[2];
 
   PID_temperature_error[2] = input;
