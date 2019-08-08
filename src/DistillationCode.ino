@@ -264,10 +264,11 @@ void loop() {
   Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
   Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
   Serial.print("F:");           Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
-  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
   if (tempAnomolyCounter > 10) {
-    Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.println("\t");
+    Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t");
   }
+  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+
 
 
   //Serial.print("Epsilon");    Serial.print("\t");   Serial.println(epsilon);                Serial.print("\t");
