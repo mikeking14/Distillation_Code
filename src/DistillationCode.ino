@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+//Changing stuff here
+=======
+>>>>>>> PID_Improvement
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Libraries and Variables-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
 //-----------------------------------------------------------Temperature---------------------------------------------------------////
@@ -18,11 +22,18 @@ DeviceAddress tempOnPin12 = {0x28, 0xB8, 0x3E, 0x94, 0x97, 0x02, 0x03, 0x50};
 DeviceAddress tempOnPin11 = {0x28, 0x9B, 0x32, 0x94, 0x97, 0x08, 0x03, 0x79};
 DeviceAddress tempOnPin10 = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 
-//Variables for PID temperature control
+// PID temperature control
 float towerTemp = 0.0; float washTemp = 0.0; float someTemp1 = 0.0; float someTemp2 = 0.0;
+// Store temperature
+const int numTempReadings = 3;
+float PID_temperature_error[numTempReadings];
+// Derivative
+float derivativeTime[numTempReadings];
+float tempDerivative = 0.0;
+
+
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
-int temperatureResolution = 12; // set the DS18B20 resolution to 9,10,11,12 (# of bits)
 float PID_error = 0.0;
 float previous_error = 0.0;
 float elapsedTime, Time, timePrev, timeLeft;
@@ -122,18 +133,21 @@ void loop() {
   someTemp1 = tempSensors.getTempC(tempOnPin11);
   someTemp2 = tempSensors.getTempC(tempOnPin10);
 
+/*
     if (towerTemp < 15 || towerTemp > 105 || washTemp < 15 || washTemp > 105 ||
         someTemp1 < 15 || someTemp1 > 105 || someTemp2< 15 || someTemp2 > 105)
        {
          tempAnomolyCounter = tempAnomolyCounter + 1;
        }
-
+*/
 
   //Next we calculate the error between the setpoint and the real value
   PID_error = set_temperature - towerTemp;
+  storeError(PID_error, millis());
+
   //Calculate the P value
   PID_p = kp * PID_error;
-  //Calculate the I value in a range on +/- 5
+  //Calculate the I value in a range on +-10
   if (-5 < PID_error < 5)
   {
     PID_i = PID_i + (ki * PID_error);
@@ -152,7 +166,7 @@ void loop() {
   Time = millis();                            // actual time read
   elapsedTime = (Time - timePrev) / 1000;
   //Now we can calculate the D value
-  PID_d = kd * ((PID_error - previous_error) / elapsedTime);
+  PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
   //Final total PID value is the sum of P + I + D
   PID_value = PID_p + PID_i + PID_d;
 
@@ -192,7 +206,6 @@ void loop() {
   LoadCell.update();
 
   //get smoothed value from data set + current calibration factor
-
   float mass = LoadCell.getData() * -1;
   t = millis();
 
@@ -248,19 +261,24 @@ void loop() {
   Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
   Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
   Serial.print("F:");           Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
+<<<<<<< HEAD
   if (tempAnomolyCounter > 10) {
     Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t");
   }
   Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
 
+
+
+  //Serial.print("Epsilon");    Serial.print("\t");   Serial.println(epsilon);                Serial.print("\t");
+=======
+if(tempAnomolyCounter > 10)
+ {Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t"); }
+  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+>>>>>>> PID_Improvement
+
 }
 
-
-
-
-
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Functions-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
-
 float calculateAverage(float input) {
   // subtract the last reading:
   total = total - readings[readIndex];
@@ -282,3 +300,16 @@ float calculateAverage(float input) {
   // send it to the computer as ASCII digits
   return average;
 }
+
+//Store the temperature and time in a matrix
+float storeError(float input, float timeMillis) {
+  // read from the sensor:
+  PID_temperature_error[0] = PID_temperature_error[1];
+  derivativeTime[0] = derivativeTime[1];
+
+  PID_temperature_error[1] = PID_temperature_error[2];
+  derivativeTime[1] = derivativeTime[2];
+
+  PID_temperature_error[2] = input;
+  derivativeTime[2] = timeMillis;
+  };
