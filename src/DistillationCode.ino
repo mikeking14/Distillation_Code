@@ -42,17 +42,15 @@ float kp = 8;   float ki = 0.90;   float kd = 15;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 
+//-----------------------------------------------------------Frequency---------------------------------------------------------////
+#include <FreqCount.h>
+unsigned long frequency = 0;
+
+
 //-----------------------------------------------------------Load Cell-----------------------------------------------------------////
 #include <HX711_ADC.h>
 HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
 long t;
-
-// Variables to keep track of the total seconds
-unsigned long time;
-unsigned int dwell = 2000; // dwell in microseconds for counter
-unsigned long final_counts;
-unsigned long start_time;
-unsigned long measured_time;
 
 //Load Cell
 float mass = 0.0;
@@ -72,6 +70,7 @@ float constant_F = 4500000.0;
 float constant_T = 0.3;
 int tempAnomolyCounter = 0;
 int state = 0;
+unsigned long time = 0;
 
 //-----------------------------------------------------------Function Variable----------------------------------------------------------------////
 //Averaging Function Variables
@@ -86,30 +85,22 @@ float average = 0; // the average
 void setup() {
 
   Serial.begin(115200);
-  //-----------------------------------------------------------Temperature---------------------------------------------------------////
-  // Start up the temperature library
   tempSensors.begin();
+  FreqCount.begin(1000);
+  LoadCell.begin();
 
   //PID temperature control
   pinMode(PWM_pin, OUTPUT);
-  TCCR2B = TCCR2B & B11111000 | 0x03;    // pin 3 and 11 PWM frequency of 980.39 Hz
+
   Time = millis();
 
-  //-----------------------------------------------------------Load Cell-----------------------------------------------------------////
-  // Start communication to the loadcell library
-  LoadCell.begin();
   long stabilisingtime = 8000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
 
   //-----------------------------------------------------------Frequency-----------------------------------------------------------////
-  TCCR1A = 0; //initialize Timer1
-  TCCR1B = 0;
-  TCNT1 = 0;
-  //555 output pin
-  pinMode(5, INPUT_PULLUP); //external source pin for timer1
-  }
 
+  }
 
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
@@ -167,33 +158,21 @@ void loop() {
   PID_value = PID_p + PID_i + PID_d;
 
   //We define PWM range between 0 and 255
-  if (PID_value < 0)
-  {
-    PID_value = 0 ;
-  }
-  if (PID_value > 107)
-  {
-    PID_value = 107;
-  }
+  if (PID_value < 0){
+    PID_value = 0 ;}
+
+  if (PID_value > 107){
+    PID_value = 107;}
+
   //Now we can write the PWM signal to the mosfet on digital pin D3
   analogWrite(PWM_pin, 255 - PID_value);
-  //analogWrite(PWM_pin,PID_value);
+
   previous_error = PID_error;     //Remember to store the previous error for next loop.
 
   //-----------------------------------------------------------Frequency-------------------------------------------------------////
 
-  start_time = micros();
-  TCNT1 = 0;//initialize counter
-  // External clock source on Timer1, pin (D5). Clock on rising edge.
-  // Setting bits starts timer
-  TCCR1B =  bit (CS10) | bit (CS11) | bit (CS12); //external clock source pin D5 rising edge
-  while (micros() - start_time < dwell) {} // do nothing but wait and count during dwell time
-  TCCR1B = 0; //stop counter
-  final_counts = TCNT1; //frequency limited by unsigned int TCNT1 without rollover counts
-  measured_time = micros() - start_time;
-  //Calculate Epsilon *****(should change [500 * final_counts] to a variable at some point)*****
-  //epsilon = (constant_F / (500 * final_counts)) - ((towerTemp - 22) * constant_T);
-
+  if (FreqCount.available()) {
+    frequency = FreqCount.read();}
 
   //-----------------------------------------------------------Load Cell-------------------------------------------------------////
 
@@ -256,23 +235,19 @@ void loop() {
 
   Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
   Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
-  Serial.print("F:");           Serial.print("\t");   Serial.print(500 * final_counts);     Serial.print("\t"); //20ms sample in H
+  Serial.print("F:");           Serial.print("\t");   Serial.print(frequency);              Serial.println("\t"); //20ms sample in H
+/*
   if (tempAnomolyCounter > 10)
- {Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t");}
-  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+ {Serial.print("tEr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t");}
 
-
-
-  //Serial.print("Epsilon");    Serial.print("\t");   Serial.println(epsilon);                Serial.print("\t");
-
-if(tempAnomolyCounter > 10)
- {Serial.print("tErr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t"); }
-  Serial.print("State:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
-
+  Serial.print("St:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+*/
 
 }
 
+
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Functions-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+
 float calculateAverage(float input) {
   // subtract the last reading:
   total = total - readings[readIndex];

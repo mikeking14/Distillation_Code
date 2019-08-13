@@ -24,3 +24,9 @@
       time = millis() / 1000;
       timeLeft = ((timePrev + 1) - time) / 1000;
       delay(timeLeft);
+
+
+
+// Epsilon Calculation
+
+      epsilon = (constant_F / (500 * final_counts)) - ((towerTemp - 22) * constant_T);
