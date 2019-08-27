@@ -30,10 +30,13 @@ float tempDerivative = 0.0;
 
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
+int setTempCounter = 10;
+int setTempCounterMax = 40;
 float PID_error = 0.0;
 float previous_error = 0.0;
 float elapsedTime, Time, timePrev, timeLeft;
 float elapsedTime2, timePrev2;
+float elapsedTime3, timePrev3;
 int PID_value = 0;
 int PWM_pin = 3; //PWM for speed control of the water pump
 
@@ -206,18 +209,45 @@ void loop() {
     Serial.println("Tare complete");
   }
 
-  // Initial check(need to make sure checkpoint = checkpointConst at the start of the distillation) to start the checkpoint timer.
-  // Wait for the massRate to begin (massRate > minMassRate)
-  if (massRate > minMassRate & checkpoint == checkpointConst) {
-    checkpoint = time + checkpointIncrement;
-    state = 1;
-  }
-  // After the distillation has started, increment the tower temperature if the flow rate becomes too slow (ie. massRate < minMassRate)
-  // and we have waited sufficiently long (ie the "time" has passed the "checkpoint" we set in the above (time > checkpoint))
-  if (massRate < minMassRate & time > checkpoint) {
-    set_temperature += 1;
-    checkpoint = time + checkpointIncrement;
-  }
+
+  time = millis()/1000;
+  // Checks for increments
+      //Increment the tower temperature if the mass flow rate falls below a certain level
+
+      if(setTempCounter == 0 & checkpoint == checkpointConst){
+        //checkpoint = time + checkpointIncrement;
+        minMassRate = 0.25;
+        checkpoint = time;
+      }
+
+      // Counter that checks every second to see if the mass rate is too slow (minMassRate). If its minMassRate then it increments a counter.
+      // If the counter is above 30 at our checkpoint then increment the setTemp.
+      elapsedTime3 = (time - timePrev3);
+      if(elapsedTime3 >= 1) {
+        timePrev3 = time;
+        if(massRate < minMassRate){
+          setTempCounter += 1;
+          if(setTempCounter > setTempCounterMax){
+            setTempCounter = setTempCounterMax;
+          }
+        }
+        else{
+          if(setTempCounter > 0){
+            setTempCounter -= 1;
+          }
+          else{
+            setTempCounter = 0;
+          }
+        }
+      }
+
+      //Check to see if the setTempCounter has reached its max and that we have waited enough time to reach our checkpoint.
+      if(setTempCounter == setTempCounterMax  & time > checkpoint){
+        set_temperature += 1;
+        setTempCounter = 0;
+        //checkpoint = time + checkpointIncrement; //Increment for checkpoint
+
+      }
 
 
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
