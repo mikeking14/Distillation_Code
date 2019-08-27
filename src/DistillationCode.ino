@@ -213,11 +213,10 @@ void loop() {
   time = millis()/1000;
   // Checks for increments
       //Increment the tower temperature if the mass flow rate falls below a certain level
-
       if(setTempCounter == 0 & checkpoint == checkpointConst){
-        //checkpoint = time + checkpointIncrement;
+        checkpoint = time + checkpointIncrement;
         minMassRate = 0.25;
-        checkpoint = time;
+        //checkpoint = time;
       }
 
       // Counter that checks every second to see if the mass rate is too slow (minMassRate). If its minMassRate then it increments a counter.
@@ -227,17 +226,11 @@ void loop() {
         timePrev3 = time;
         if(massRate < minMassRate){
           setTempCounter += 1;
-          if(setTempCounter > setTempCounterMax){
-            setTempCounter = setTempCounterMax;
-          }
+          if(setTempCounter > setTempCounterMax) {setTempCounter = setTempCounterMax;}
         }
         else{
-          if(setTempCounter > 0){
-            setTempCounter -= 1;
-          }
-          else{
-            setTempCounter = 0;
-          }
+          if(setTempCounter > 0){setTempCounter -= 1;}
+          else{setTempCounter = 0;}
         }
       }
 
@@ -245,7 +238,7 @@ void loop() {
       if(setTempCounter == setTempCounterMax  & time > checkpoint){
         set_temperature += 1;
         setTempCounter = 0;
-        //checkpoint = time + checkpointIncrement; //Increment for checkpoint
+        checkpoint = time + checkpointIncrement; //Increment for checkpoint
 
       }
 
