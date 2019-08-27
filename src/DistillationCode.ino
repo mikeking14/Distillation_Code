@@ -30,7 +30,7 @@ float tempDerivative = 0.0;
 
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
-int setTempCounter = 10;
+int setTempCounter = 40;
 int setTempCounterMax = 40;
 float PID_error = 0.0;
 float previous_error = 0.0;
@@ -75,7 +75,7 @@ int tempAnomolyCounter = 0;
 int state = 0;
 unsigned long time = 0;
 float print_time = 0;
-
+int state = 0;
 //-----------------------------------------------------------Function Variable----------------------------------------------------------------////
 //Averaging Function Variables
 const int numReadings = 10;
@@ -101,8 +101,6 @@ void setup() {
   long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
-
-  //-----------------------------------------------------------Frequency-----------------------------------------------------------////
 
   }
 
@@ -212,6 +210,7 @@ void loop() {
 
   time = millis()/1000;
   // Checks for increments
+
       //Increment the tower temperature if the mass flow rate falls below a certain level
       if(setTempCounter == 0 & checkpoint == checkpointConst){
         checkpoint = time + checkpointIncrement;
@@ -219,13 +218,15 @@ void loop() {
         //checkpoint = time;
       }
 
-      // Counter that checks every second to see if the mass rate is too slow (minMassRate). If its minMassRate then it increments a counter.
+      // Checks every second to see if the mass rate is too slow (minMassRate). If massRate < minMassRate then it increments a counter.
       // If the counter is above 30 at our checkpoint then increment the setTemp.
       elapsedTime3 = (time - timePrev3);
       if(elapsedTime3 >= 1) {
         timePrev3 = time;
         if(massRate < minMassRate){
+          //Only increment if distillation has started
           setTempCounter += 1;
+          //Keep the counter at the max level
           if(setTempCounter > setTempCounterMax) {setTempCounter = setTempCounterMax;}
         }
         else{
@@ -258,7 +259,7 @@ void loop() {
       Serial.print("F:");           Serial.print("\t");     Serial.print(frequency);              Serial.print("\t"); //20ms sample in H
       Serial.print("ST:");          Serial.print("\t");     Serial.print(set_temperature);        Serial.print("\t"); //20ms sample in H
       Serial.print("  STCnt");      Serial.print(",");      Serial.print(setTempCounter);         Serial.print(",");
-      Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.print(",");
+      Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.println(",");
       //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
       Serial.print("PID");          Serial.print("\t");     Serial.print(255 - PID_value);        Serial.print("\t");
       Serial.print("P:");           Serial.print("\t");     Serial.print(PID_p);                  Serial.print("\t");
