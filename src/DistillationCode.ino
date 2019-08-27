@@ -13,13 +13,13 @@ OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature.
 DallasTemperature tempSensors(&oneWire);
 // Declare the addresses of the DS18B20's
-DeviceAddress tempOnPin13 = {0x28, 0x25, 0x34, 0x94, 0x97, 0x0E, 0x03, 0x5B};
-DeviceAddress tempOnPin12 = {0x28, 0xB8, 0x3E, 0x94, 0x97, 0x02, 0x03, 0x50};
-DeviceAddress tempOnPin11 = {0x28, 0x9B, 0x32, 0x94, 0x97, 0x08, 0x03, 0x79};
-DeviceAddress tempOnPin10 = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
+DeviceAddress tempHE = {0x28, 0x25, 0x34, 0x94, 0x97, 0x0E, 0x03, 0x5B};
+DeviceAddress tempT = {0x28, 0xB8, 0x3E, 0x94, 0x97, 0x02, 0x03, 0x50};
+DeviceAddress tempW = {0x28, 0xFF, 0x87, 0x19, 0xA5, 0x16, 0x03, 0x1E};
+DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 
 // PID temperature control
-float towerTemp = 0.0; float washTemp = 0.0; float someTemp1 = 0.0; float someTemp2 = 0.0;
+float tempHeatExchanger = 0.0; float tempTower = 0.0; float tempWash = 0.0; float tempOutlet = 0.0;
 // Store temperature
 const int numTempReadings = 3;
 float PID_temperature_error[numTempReadings];
@@ -116,21 +116,21 @@ void loop() {
   // Read the value of temperature probes
   tempSensors.requestTemperatures();
 
-  towerTemp = tempSensors.getTempC(tempOnPin13);
-  washTemp =  tempSensors.getTempC(tempOnPin12);
-  someTemp1 = tempSensors.getTempC(tempOnPin11);
-  someTemp2 = tempSensors.getTempC(tempOnPin10);
+  tempHeatExchanger = tempSensors.getTempC(tempHE);
+  tempTower =  tempSensors.getTempC(tempT);
+  tempWash = tempSensors.getTempC(tempW);
+  tempOutlet = tempSensors.getTempC(tempO);
 
     //Temperarure Anomoly Counter
-    if (towerTemp < 15 || towerTemp > 105 || washTemp < 15 || washTemp > 105 ||
-        someTemp1 < 15 || someTemp1 > 105 || someTemp2< 15 || someTemp2 > 105)
+    if (tempHeatExchanger < 15 || tempHeatExchanger > 105 || tempTower < 15 || tempTower > 105 ||
+        tempWash < 15 || tempWash > 105 || tempOutlet< 15 || tempOutlet > 105)
        {
          tempAnomolyCounter = tempAnomolyCounter + 1;
        }
 
 
   //Next we calculate the error between the setpoint and the real value
-  PID_error = set_temperature - towerTemp;
+  PID_error = set_temperature - tempHeatExchanger;
   storeError(PID_error, millis());
 
   //Calculate the P value
@@ -226,10 +226,10 @@ void loop() {
 
       print_time = time;
                                                           Serial.print(time);                   Serial.print("\t");
-      Serial.print("T°:");          Serial.print("\t");   Serial.print(towerTemp);              Serial.print("\t");
-      Serial.print("W°:");          Serial.print("\t");   Serial.print(washTemp);               Serial.print("\t");
-      Serial.print("1°:");          Serial.print("\t");   Serial.print(someTemp1);              Serial.print("\t");
-      Serial.print("2°:");          Serial.print("\t");   Serial.print(someTemp2);              Serial.print("\t");
+      Serial.print("HE°:");          Serial.print("\t");   Serial.print(tempHeatExchanger);              Serial.print("\t");
+      Serial.print("T°:");          Serial.print("\t");   Serial.print(tempTower);               Serial.print("\t");
+      Serial.print("W°:");          Serial.print("\t");   Serial.print(tempWash);              Serial.print("\t");
+      Serial.print("Out°:");          Serial.print("\t");   Serial.print(tempOutlet);              Serial.print("\t");
 
       //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
       Serial.print("PID");          Serial.print("\t");   Serial.print(255 - PID_value);        Serial.print("\t");
