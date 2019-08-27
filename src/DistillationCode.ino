@@ -265,7 +265,7 @@ void loop() {
       Serial.print("F:");           Serial.print("\t");     Serial.print(frequency);              Serial.print("\t"); //20ms sample in H
       Serial.print("ST:");          Serial.print("\t");     Serial.print(set_temperature);        Serial.print("\t"); //20ms sample in H
       Serial.print("  STCnt");      Serial.print(",");      Serial.print(setTempCounter);         Serial.print(",");
-      Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.println(",");
+      Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.print(",");
       //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
       Serial.print("PID");          Serial.print("\t");     Serial.print(255 - PID_value);        Serial.print("\t");
       Serial.print("P:");           Serial.print("\t");     Serial.print(PID_p);                  Serial.print("\t");
