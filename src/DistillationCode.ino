@@ -44,7 +44,7 @@ float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 
 //-----------------------------------------------------------Frequency---------------------------------------------------------////
 #include <FreqCount.h>
-unsigned long frequency = 0;
+unsigned long frequency;
 
 
 //-----------------------------------------------------------Load Cell-----------------------------------------------------------////
@@ -71,6 +71,7 @@ float constant_T = 0.3;
 int tempAnomolyCounter = 0;
 int state = 0;
 unsigned long time = 0;
+float print_time = 0;
 
 //-----------------------------------------------------------Function Variable----------------------------------------------------------------////
 //Averaging Function Variables
@@ -221,27 +222,31 @@ void loop() {
 
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
 
-                                                      Serial.print(time);                   Serial.print("\t");
-  Serial.print("T°:");          Serial.print("\t");   Serial.print(towerTemp);              Serial.print("\t");
-  Serial.print("W°:");          Serial.print("\t");   Serial.print(washTemp);               Serial.print("\t");
-  Serial.print("1°:");          Serial.print("\t");   Serial.print(someTemp1);              Serial.print("\t");
-  Serial.print("2°:");          Serial.print("\t");   Serial.print(someTemp2);              Serial.print("\t");
+  if(time > print_time + .5){
 
-  //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
-  Serial.print("PID");          Serial.print("\t");   Serial.print(255 - PID_value);        Serial.print("\t");
-  Serial.print("P:");           Serial.print("\t");   Serial.print(PID_p);                  Serial.print("\t");
-  Serial.print("I:");           Serial.print("\t");   Serial.print(PID_i);                  Serial.print("\t");
-  Serial.print("D:");           Serial.print("\t");   Serial.print(PID_d);                  Serial.print("\t");
+      print_time = time;
+                                                          Serial.print(time);                   Serial.print("\t");
+      Serial.print("T°:");          Serial.print("\t");   Serial.print(towerTemp);              Serial.print("\t");
+      Serial.print("W°:");          Serial.print("\t");   Serial.print(washTemp);               Serial.print("\t");
+      Serial.print("1°:");          Serial.print("\t");   Serial.print(someTemp1);              Serial.print("\t");
+      Serial.print("2°:");          Serial.print("\t");   Serial.print(someTemp2);              Serial.print("\t");
 
-  Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
-  Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
-  Serial.print("F:");           Serial.print("\t");   Serial.print(frequency);              Serial.println("\t"); //20ms sample in H
-/*
-  if (tempAnomolyCounter > 10)
- {Serial.print("tEr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t");}
+      //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
+      Serial.print("PID");          Serial.print("\t");   Serial.print(255 - PID_value);        Serial.print("\t");
+      Serial.print("P:");           Serial.print("\t");   Serial.print(PID_p);                  Serial.print("\t");
+      Serial.print("I:");           Serial.print("\t");   Serial.print(PID_i);                  Serial.print("\t");
+      Serial.print("D:");           Serial.print("\t");   Serial.print(PID_d);                  Serial.print("\t");
 
-  Serial.print("St:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
-*/
+      Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
+      Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
+      Serial.print("F:");           Serial.print("\t");   Serial.print(frequency);              Serial.println("\t"); //20ms sample in H
+      /*
+      if (tempAnomolyCounter > 10)
+      {Serial.print("tEr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t");}
+
+      Serial.print("St:");       Serial.print("\t");   Serial.print(state);                  Serial.println("\t");
+      */
+      }
 
 }
 
