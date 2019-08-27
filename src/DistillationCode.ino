@@ -95,7 +95,7 @@ void setup() {
 
   Time = millis();
 
-  long stabilisingtime = 8000; // tare preciscion can be improved by adding a few seconds of stabilising time
+  long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
 
@@ -225,21 +225,23 @@ void loop() {
   if(time > print_time + .5){
 
       print_time = time;
-                                                          Serial.print(time);                   Serial.print("\t");
-      Serial.print("HE°:");          Serial.print("\t");   Serial.print(tempHeatExchanger);              Serial.print("\t");
-      Serial.print("T°:");          Serial.print("\t");   Serial.print(tempTower);               Serial.print("\t");
-      Serial.print("W°:");          Serial.print("\t");   Serial.print(tempWash);              Serial.print("\t");
-      Serial.print("Out°:");          Serial.print("\t");   Serial.print(tempOutlet);              Serial.print("\t");
+                                                            Serial.print(time);                  Serial.print("\t");
+      Serial.print("HE°:");         Serial.print("\t");     Serial.print(tempHeatExchanger);     Serial.print("\t");
+      Serial.print("T°:");          Serial.print("\t");     Serial.print(tempTower);             Serial.print("\t");
+      Serial.print("W°:");          Serial.print("\t");     Serial.print(tempWash);              Serial.print("\t");
+      Serial.print("Out°:");        Serial.print("\t");     Serial.print(tempOutlet);            Serial.print("\t");
+      Serial.print("M: ");          Serial.print("\t");     Serial.print(mass);                  Serial.print("\t");
+      Serial.print("ΔM: ");         Serial.print("\t");     Serial.print(massRate);              Serial.print("\t");
+      Serial.print("F:");           Serial.print("\t");     Serial.print(frequency);             Serial.print("\t"); //20ms sample in H
+      Serial.print("SetT:");        Serial.print("\t");     Serial.print(set_temperature);       Serial.print("\t"); //20ms sample in H
 
       //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
-      Serial.print("PID");          Serial.print("\t");   Serial.print(255 - PID_value);        Serial.print("\t");
-      Serial.print("P:");           Serial.print("\t");   Serial.print(PID_p);                  Serial.print("\t");
-      Serial.print("I:");           Serial.print("\t");   Serial.print(PID_i);                  Serial.print("\t");
-      Serial.print("D:");           Serial.print("\t");   Serial.print(PID_d);                  Serial.print("\t");
+      Serial.print("PID");          Serial.print("\t");     Serial.print(255 - PID_value);        Serial.print("\t");
+      Serial.print("P:");           Serial.print("\t");     Serial.print(PID_p);                  Serial.print("\t");
+      Serial.print("I:");           Serial.print("\t");     Serial.print(PID_i);                  Serial.print("\t");
+      Serial.print("D:");           Serial.print("\t");     Serial.print(PID_d);                  Serial.println("\t");
 
-      Serial.print("M: ");          Serial.print("\t");   Serial.print(mass);                   Serial.print("\t");
-      Serial.print("ΔM: ");         Serial.print("\t");   Serial.print(massRate);               Serial.print("\t");
-      Serial.print("F:");           Serial.print("\t");   Serial.print(frequency);              Serial.println("\t"); //20ms sample in H
+
       /*
       if (tempAnomolyCounter > 10)
       {Serial.print("tEr:");        Serial.print("\t");   Serial.print(tempAnomolyCounter);     Serial.print("\t");}
