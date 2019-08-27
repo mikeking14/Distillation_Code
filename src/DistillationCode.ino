@@ -72,7 +72,6 @@ float epsilon = 0.0;
 float constant_F = 4500000.0;
 float constant_T = 0.3;
 int tempAnomolyCounter = 0;
-int state = 0;
 unsigned long time = 0;
 float print_time = 0;
 int state = 0;
@@ -259,7 +258,7 @@ void loop() {
       Serial.print("F:");           Serial.print("\t");     Serial.print(frequency);              Serial.print("\t"); //20ms sample in H
       Serial.print("ST:");          Serial.print("\t");     Serial.print(set_temperature);        Serial.print("\t"); //20ms sample in H
       Serial.print("  STCnt");      Serial.print(",");      Serial.print(setTempCounter);         Serial.print(",");
-      Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.println(",");
+      Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.print(",");
       //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
       Serial.print("PID");          Serial.print("\t");     Serial.print(255 - PID_value);        Serial.print("\t");
       Serial.print("P:");           Serial.print("\t");     Serial.print(PID_p);                  Serial.print("\t");
