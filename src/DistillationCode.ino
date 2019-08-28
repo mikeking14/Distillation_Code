@@ -130,7 +130,7 @@ void loop() {
 
 
   //Next we calculate the error between the setpoint and the real value
-  PID_error = set_temperature - tempHeatExchanger;
+  PID_error = set_temperature - tempTower;
   storeError(PID_error, millis());
 
   //Calculate the P value
