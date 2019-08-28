@@ -30,8 +30,8 @@ float tempDerivative = 0.0;
 
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
-int setTempCounter = 40;
-int setTempCounterMax = 40;
+int setTempCounter = 20;
+int setTempCounterMax = 30;
 float PID_error = 0.0;
 float previous_error = 0.0;
 float elapsedTime, Time, timePrev, timeLeft;
