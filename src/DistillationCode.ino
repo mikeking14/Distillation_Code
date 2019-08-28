@@ -38,7 +38,7 @@ float elapsedTime, Time, timePrev, timeLeft;
 float elapsedTime2, timePrev2;
 float elapsedTime3, timePrev3;
 int PID_value = 0;
-int PWM_pin = 3; //PWM for speed control of the water pump
+int PWM_pin = 6; //PWM for speed control of the water pump
 
 //PID Constants
 float kp = 8;   float ki = 0.90;   float kd = 15;
