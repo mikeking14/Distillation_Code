@@ -63,7 +63,7 @@ float prevMass = 0.0;
 float minMassRate = 0.1;
 int checkpointConst = 10000;
 int checkpoint = checkpointConst;
-int checkpointIncrement = 100;
+int checkpointIncrement = 50;
 
 //-----------------------------------------------------------Other----------------------------------------------------------------////
 //Epsilon Constants
@@ -162,8 +162,8 @@ void loop() {
   if (PID_value < 0){
     PID_value = 0 ;}
 
-  if (PID_value > 107){
-    PID_value = 107;}
+  if (PID_value > 130){
+    PID_value = 130;}
 
   //Now we can write the PWM signal to the mosfet on digital pin D3
   analogWrite(PWM_pin, 255 - PID_value);
