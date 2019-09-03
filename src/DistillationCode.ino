@@ -92,16 +92,14 @@ void setup() {
   FreqCount.begin(1000);
   LoadCell.begin();
 
-  //PID temperature control
-  pinMode(PWM_pin, OUTPUT);
-
   Time = millis();
 
   long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
 
-  }
+  //PID temperature control
+}
 
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
@@ -162,8 +160,8 @@ void loop() {
   if (PID_value < 0){
     PID_value = 0 ;}
 
-  if (PID_value > 130){
-    PID_value = 130;}
+  if (PID_value > 135){
+    PID_value = 135;}
 
   //Now we can write the PWM signal to the mosfet on digital pin D3
   analogWrite(PWM_pin, 255 - PID_value);
@@ -260,7 +258,7 @@ void loop() {
       Serial.print("  STCnt");      Serial.print(",");      Serial.print(setTempCounter);         Serial.print(",");
       Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.print(",");
       //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
-      Serial.print("PID");          Serial.print("\t");     Serial.print(255 - PID_value);        Serial.print("\t");
+      Serial.print("PID");          Serial.print("\t");     Serial.print((255 - PID_value)/255*100);        Serial.print("\t");
       Serial.print("P:");           Serial.print("\t");     Serial.print(PID_p);                  Serial.print("\t");
       Serial.print("I:");           Serial.print("\t");     Serial.print(PID_i);                  Serial.print("\t");
       Serial.print("D:");           Serial.print("\t");     Serial.print(PID_d);                  Serial.println("\t");
