@@ -18,27 +18,25 @@ clear;
         opts.EmptyLineRule = "read";
 
     % Import the data
-        arduino = readtable("/Users/michaelking/Documents/MATLAB/Distillation Project/DistillationRun32_Arduino.csv", opts);
+        arduino = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run32/DistillationRun32_Arduino.csv", opts);
         clear opts
 
  %% Import DMM Data
-    % Setup the Import Options
-        opts = delimitedTextImportOptions("NumVariables", 2);
+     % Setup the Import Options
+        opts = spreadsheetImportOptions("NumVariables", 2);
 
-    % Specify range and delimiter
-        opts.DataLines = [2, Inf];
-        opts.Delimiter = ",";
+     % Specify sheet and range
+        opts.Sheet = "sheet1";
+        opts.DataRange = "A2:B4795";
 
-    % Specify column names and types
+     % Specify column names and types
         opts.VariableNames = ["Time", "Untitled"];
-        opts.VariableTypes = ["string", "double"];
-        opts = setvaropts(opts, 1, "WhitespaceRule", "preserve");
-        opts = setvaropts(opts, 1, "EmptyFieldRule", "auto");
-        opts.ExtraColumnsRule = "ignore";
-        opts.EmptyLineRule = "read";
+        opts.SelectedVariableNames = ["Time", "Untitled"];
+        opts.VariableTypes = ["datetime", "double"];
+        opts = setvaropts(opts, 1, "InputFormat", "");
 
-    % Import the data
-        DMM = readtable("/Users/michaelking/Documents/MATLAB/Distillation Project/DistillationRun32_DMM.csv", opts);
+     % Import the data
+        DMM = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run32/DistillationRun32_DMM.xlsx", opts, "UseExcel", false);
         clear opts
 
 %% Input variables from arduino
@@ -47,7 +45,7 @@ clear;
     arduino_Time = extractBefore(arduino_Time,13);
     arduino_Time = datetime(arduino_Time,'InputFormat', 'HH:mm:ss.SSS');
     arduino_Time.Month = 8;
-    arduino_Time.Day = 28;
+    arduino_Time.Day = 27;
     arduino_Time.Format = 'default';
 
     %Add the datetime for arduino to the arduino table
@@ -109,10 +107,10 @@ clear;
         % Left side of graph
             yyaxis left
             ylabel 'Frequency'
-            %ylim([136000 150000])
-            ylim([0 5000000])
-            plot(freq_Smooth*10, '-b')
-            plot(resistivity_Smooth/5, 'g')
+            ylim([120000 150000])
+            %ylim([0 5000000])
+            plot(freq_Smooth, '-b')
+            %plot(resistivity_Smooth/5, 'g')
         % Right side of graph
             yyaxis right
             ylabel 'Mass / Temperature'
@@ -122,7 +120,9 @@ clear;
             plot(wash_Temp_Smooth, '-c')
             plot(outlet_Temp_Smooth, '-k')
             plot(mass_Rate_Smooth*100, 'y')
-            legend({'Frequency','Resistivity','Mass/15', 'Tower Temperature', 'Wash Temperature','Mass Rate * 100' },'Location','Northwest')
+         
+        % Legend 
+            legend({'Frequency','Mass/15', 'Tower Temperature', 'Wash Temperature','Mass Rate * 100' },'Location','Northwest')
             hold off
 
     %Frequency Vs Mass

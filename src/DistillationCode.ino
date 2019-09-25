@@ -44,6 +44,7 @@ int PWM_pin = 6; //PWM for speed control of the water pump
 float kp = 8;   float ki = 0.90;   float kd = 15;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
+int PID_max = 130;    int PID_min = 0;
 
 //-----------------------------------------------------------Frequency---------------------------------------------------------////
 #include <FreqCount.h>
@@ -92,14 +93,16 @@ void setup() {
   FreqCount.begin(1000);
   LoadCell.begin();
 
+  //PID temperature control
+  pinMode(PWM_pin, OUTPUT);
+
   Time = millis();
 
   long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
 
-  //PID temperature control
-}
+  }
 
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
@@ -113,39 +116,40 @@ void loop() {
   //-----------------------------------------------------------Temperature & PID CONTROL------------------------------------------////
   // Read the value of temperature probes
   tempSensors.requestTemperatures();
-
+  // Store the previous temperatures incase of an anomoly in the new reading
+  prevTempHeatExchanger = tempHeatExchanger
+  prevTempTower =  tempTower
+  prevTempWash =  tempWash
+  prevTempOutlet = tempOutlet
+  // Store the actual temperature now
   tempHeatExchanger = tempSensors.getTempC(tempHE);
   tempTower =  tempSensors.getTempC(tempT);
   tempWash = tempSensors.getTempC(tempW);
   tempOutlet = tempSensors.getTempC(tempO);
-
-    //Temperarure Anomoly Counter
-    if (tempHeatExchanger < 15 || tempHeatExchanger > 105 || tempTower < 15 || tempTower > 105 ||
-        tempWash < 15 || tempWash > 105 || tempOutlet< 15 || tempOutlet > 105)
-       {
-         tempAnomolyCounter = tempAnomolyCounter + 1;
-       }
-
+        //Temperarure Anomoly Counter
+        if (tempHeatExchanger < 10 || tempHeatExchanger > 130 || tempTower < 10 || tempTower > 130 ||
+            tempWash < 10 || tempWash > 130 || tempOutlet< 10 || tempOutlet > 130)
+           {
+             tempAnomolyCounter = tempAnomolyCounter + 1;
+             tempHeatExchanger = prevTempHeatExchanger;
+             tempTower = prevTempTower;
+             tempWash = prevTempWash;
+             tempOutlet = prevTempOutlet;
+           }
 
   //Next we calculate the error between the setpoint and the real value
   PID_error = set_temperature - tempTower;
   storeError(PID_error, millis());
-
   //Calculate the P value
   PID_p = kp * PID_error;
   //Calculate the I value in a range on +-10
-  if (-5 < PID_error < 5)
-  {
-    PID_i = PID_i + (ki * PID_error);
-    if (PID_i > 100)
-    {
-      PID_i = 100;
+  if (-5 < PID_error < 5){
+      PID_i = PID_i + (ki * PID_error);
+      if (PID_i > 100){
+        PID_i = 100;}
+      else if (PID_i < -25){
+        PID_i = -5;}
     }
-    else if (PID_i < -25)
-    {
-      PID_i = -5;
-    }
-  }
 
   //For derivative we need real time to calculate speed change rate
   timePrev = Time;                            // the previous time is stored before the actual time read
@@ -157,16 +161,14 @@ void loop() {
   PID_value = PID_p + PID_i + PID_d;
 
   //We define PWM range between 0 and 255
-  if (PID_value < 0){
-    PID_value = 0 ;}
-
-  if (PID_value > 135){
-    PID_value = 135;}
-
+  if (PID_value < PID_min){
+    PID_value = PID_min ;}
+  if (PID_value > PID_max){
+    PID_value = PID_max;}
   //Now we can write the PWM signal to the mosfet on digital pin D3
   analogWrite(PWM_pin, 255 - PID_value);
-
-  previous_error = PID_error;     //Remember to store the previous error for next loop.
+  //Remember to store the previous error for next loop.
+  previous_error = PID_error;
 
   //-----------------------------------------------------------Frequency-------------------------------------------------------////
 
@@ -175,15 +177,13 @@ void loop() {
 
   //-----------------------------------------------------------Load Cell-------------------------------------------------------////
 
-  //update() should be called at least as often as HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS
-  //longer delay in sketch will reduce effective sample rate (be carefull with delay() in loop)
+  // Update() should be called at least as often as HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS
+  // Longer delay in sketch will reduce effective sample rate (be carefull with delay() in loop)
   LoadCell.update();
-
-  //get smoothed value from data set + current calibration factor
+  // Get smoothed value from data set + current calibration factor
   float mass = LoadCell.getData() * -1;
   t = millis();
-
-  //Calculate the mass flow rate
+  // Calculate the mass flow rate
   averageMass = calculateAverage(mass);
   elapsedTime2 = (t - timePrev2) / 1000;
   if (elapsedTime2 > 1) {
@@ -191,15 +191,13 @@ void loop() {
     timePrev2 = t;
     prevMass = averageMass;
   }
-
-  //receive from serial terminal
+  // Receive from serial terminal
   if (Serial.available() > 0) {
     float mass;
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay();
   }
-
-  //check if last tare operation is complete
+  // Check if last tare operation is complete
   if (LoadCell.getTareStatus() == true) {
     Serial.println("Tare complete");
   }
@@ -207,14 +205,12 @@ void loop() {
 
   time = millis()/1000;
   // Checks for increments
-
       //Increment the tower temperature if the mass flow rate falls below a certain level
       if(setTempCounter == 0 & checkpoint == checkpointConst){
         checkpoint = time + checkpointIncrement;
         minMassRate = 0.25;
         //checkpoint = time;
       }
-
       // Checks every second to see if the mass rate is too slow (minMassRate). If massRate < minMassRate then it increments a counter.
       // If the counter is above 30 at our checkpoint then increment the setTemp.
       elapsedTime3 = (time - timePrev3);
@@ -246,22 +242,21 @@ void loop() {
   if(time > print_time + .5){
 
       print_time = time;
-                                                            Serial.print(time);                   Serial.print("\t");
-      Serial.print("HE°:");         Serial.print("\t");     Serial.print(tempHeatExchanger);      Serial.print("\t");
-      Serial.print("T°:");          Serial.print("\t");     Serial.print(tempTower);              Serial.print("\t");
-      Serial.print("W°:");          Serial.print("\t");     Serial.print(tempWash);               Serial.print("\t");
-      Serial.print("Out°:");        Serial.print("\t");     Serial.print(tempOutlet);             Serial.print("\t");
-      Serial.print("M: ");          Serial.print("\t");     Serial.print(mass);                   Serial.print("\t");
-      Serial.print("ΔM: ");         Serial.print("\t");     Serial.print(massRate);               Serial.print("\t");
-      Serial.print("F:");           Serial.print("\t");     Serial.print(frequency);              Serial.print("\t"); //20ms sample in H
-      Serial.print("ST:");          Serial.print("\t");     Serial.print(set_temperature);        Serial.print("\t"); //20ms sample in H
-      Serial.print("  STCnt");      Serial.print(",");      Serial.print(setTempCounter);         Serial.print(",");
-      Serial.print("  ChkP:");      Serial.print(",");      Serial.print(checkpoint);             Serial.print(",");
-      //Uncomment if you need to see the output behind the PID Control [Format: (255-P+I+D) | P | I | D ]
-      Serial.print("PID");          Serial.print("\t");     Serial.print((255 - PID_value)/255*100);        Serial.print("\t");
-      Serial.print("P:");           Serial.print("\t");     Serial.print(PID_p);                  Serial.print("\t");
-      Serial.print("I:");           Serial.print("\t");     Serial.print(PID_i);                  Serial.print("\t");
-      Serial.print("D:");           Serial.print("\t");     Serial.print(PID_d);                  Serial.println("\t");
+      PID_Percent = (255 - PID_value)/(255-)                                                    Serial.print(time);                       Serial.print("\t");
+      Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
+      Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
+      Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
+      Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
+      Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
+      Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
+      Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
+      Serial.print("ST:");        Serial.print("\t");     Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
+      Serial.print("  STCnt");    Serial.print(",");      Serial.print(setTempCounter);             Serial.print(",");
+      Serial.print("  ChkP:");    Serial.print(",");      Serial.print(checkpoint);                 Serial.print(",");
+      Serial.print("PID");        Serial.print("\t");     Serial.print(());  Serial.print("\t");
+      Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
+      Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
+      Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.println("\t");
 
 
       /*
