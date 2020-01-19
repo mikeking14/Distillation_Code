@@ -18,7 +18,7 @@ clear;
         opts.EmptyLineRule = "read";
 
     % Import the data
-        arduino = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run32/DistillationRun32_Arduino.csv", opts);
+        arduino = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run28/Distillation_Run_28_Proccessed.csv", opts);
         clear opts
 
  %% Import DMM Data
