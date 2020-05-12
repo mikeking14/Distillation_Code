@@ -1,14 +1,19 @@
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Libraries and Variables-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+//-----------------------------------------------------------Motor---------------------------------------------------------////
+#include <AccelStepper.h>
+#define dirPin 2  //StepperMotor Direction pin
+#define stepPin 3 //StepperMotor Stepping pin
+#define motorInterfaceType 1  //StepperMotor Interface Type (1 is for driver)
+
+int motorSetPosition = 0.0;
+
+AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
 
 //-----------------------------------------------------------Temperature---------------------------------------------------------////
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
-// Data wire is plugged into pin 13 on the Arduino
-#define ONE_WIRE_BUS 12
-
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-OneWire oneWire(ONE_WIRE_BUS);
+#define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
+OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 
 // Pass our oneWire reference to Dallas Temperature.
 DallasTemperature tempSensors(&oneWire);
@@ -21,6 +26,7 @@ DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 // PID temperature control
 float tempHeatExchanger = 0.0; float tempTower = 0.0; float tempWash = 0.0; float tempOutlet = 0.0;
 float prevTempHeatExchanger = 0.0; float prevTempTower = 0.0; float prevTempWash = 0.0; float prevTempOutlet = 0.0;
+
 // Store temperature
 const int numTempReadings = 3;
 float PID_temperature_error[numTempReadings];
@@ -37,18 +43,17 @@ float elapsedTime, Time, timePrev, timeLeft;
 float elapsedTime2, timePrev2;
 float elapsedTime3, timePrev3;
 int PID_value = 0;
-int PWM_pin = 6; //PWM for speed control of the water pump
 
 //PID Constants
 float kp = 8;   float ki = 0.90;   float kd = 15;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
-int PID_max = 130;    int PID_min = 0;      int PID_Percent = 0;
+int PID_max = 255;    int PID_min = 0;      float PID_Percent = 0.0;
+
 
 //-----------------------------------------------------------Frequency---------------------------------------------------------////
 #include <FreqCount.h>
 unsigned long frequency;
-
 
 //-----------------------------------------------------------Load Cell-----------------------------------------------------------////
 #include <HX711_ADC.h>
@@ -75,7 +80,8 @@ int tempAnomolyCounter = 0;
 unsigned long time = 0;
 float print_time = 0;
 int state = 0;
-//-----------------------------------------------------------Function Variable----------------------------------------------------------------////
+
+//-----------------------------------------------------------Function Variables----------------------------------------------------------------////
 //Averaging Function Variables
 const int numReadings = 10;
 float readings[numReadings]; // the readings from the analog input
@@ -92,17 +98,19 @@ void setup() {
   FreqCount.begin(1000);
   LoadCell.begin();
 
-  //PID temperature control
-  pinMode(PWM_pin, OUTPUT);
+  motor.setMaxSpeed(500);
+  motor.setCurrentPosition(0);
 
   Time = millis();
 
   long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
-
+  // Check if last tare operation is complete
+  if (LoadCell.getTareStatus() == true) {
+    Serial.println("Tare complete");
   }
-
+}
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
@@ -113,7 +121,6 @@ void loop() {
   time = (millis()) / 1000;
 
   //-----------------------------------------------------------Temperature & PID CONTROL------------------------------------------////
-
   // Store the previous temperatures incase of an anomoly in the new reading
   prevTempHeatExchanger = tempHeatExchanger;
   prevTempTower =  tempTower;
@@ -157,16 +164,26 @@ void loop() {
   elapsedTime = (Time - timePrev) / 1000;
   //Now we can calculate the D value
   PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
+
   //Final total PID value is the sum of P + I + D
   PID_value = PID_p + PID_i + PID_d;
 
-  //We define PWM range between 0 and 255
+  //We define PID range between 0 and 255
   if (PID_value < PID_min){
     PID_value = PID_min ;}
   if (PID_value > PID_max){
     PID_value = PID_max;}
-  //Now we can write the PWM signal to the mosfet on digital pin D3
-  analogWrite(PWM_pin, 255 - PID_value);
+  //Now we can set the valve position
+
+  motorSetPosition = (255-PID_value)*5; // Calculate the valve position.
+  while(motor.currentPosition() < motorSetPosition) {
+    motor.setSpeed(200);
+    motor.runSpeed();
+  }
+  while(motor.currentPosition() > motorSetPosition) {
+    motor.setSpeed(-200);
+    motor.runSpeed();
+  }
   //Remember to store the previous error for next loop.
   previous_error = PID_error;
 
@@ -197,11 +214,8 @@ void loop() {
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay();
   }
-  // Check if last tare operation is complete
-  if (LoadCell.getTareStatus() == true) {
-    Serial.println("Tare complete");
-  }
 
+  //-----------------------------------------------------------Set Temperarure Incrementer-------------------------------------------------------////
 
   time = millis()/1000;
   // Checks for increments
@@ -236,7 +250,6 @@ void loop() {
 
       }
 
-
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
 
   if(time > print_time + .5){
@@ -253,12 +266,14 @@ void loop() {
       Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
       Serial.print("ST:");        Serial.print("\t");     Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
       Serial.print("  STCnt");    Serial.print(",");      Serial.print(setTempCounter);             Serial.print(",");
-      Serial.print("  ChkP:");    Serial.print(",");      Serial.print(checkpoint);                 Serial.print(",");
-      Serial.print("PID");        Serial.print("\t");     Serial.print((PID_value));  Serial.print("\t");
+      Serial.print("  ChkP:");    Serial.print(",");      Serial.print(checkpoint);                 Serial.println(",");
+
+/*
+      Serial.print("PID");        Serial.print("\t");     Serial.print(PID_value);                  Serial.print("\t");
       Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
       Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
       Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.println("\t");
-
+*/
 
       /*
       if (tempAnomolyCounter > 10)
