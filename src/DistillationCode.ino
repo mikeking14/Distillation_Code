@@ -5,7 +5,7 @@
 #include <DallasTemperature.h>
 
 // Data wire is plugged into pin 13 on the Arduino
-#define ONE_WIRE_BUS 13
+#define ONE_WIRE_BUS 12
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
@@ -20,14 +20,13 @@ DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 
 // PID temperature control
 float tempHeatExchanger = 0.0; float tempTower = 0.0; float tempWash = 0.0; float tempOutlet = 0.0;
+float prevTempHeatExchanger = 0.0; float prevTempTower = 0.0; float prevTempWash = 0.0; float prevTempOutlet = 0.0;
 // Store temperature
 const int numTempReadings = 3;
 float PID_temperature_error[numTempReadings];
 // Derivative
 float derivativeTime[numTempReadings];
 float tempDerivative = 0.0;
-
-
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
 int setTempCounter = 20;
@@ -44,7 +43,7 @@ int PWM_pin = 6; //PWM for speed control of the water pump
 float kp = 8;   float ki = 0.90;   float kd = 15;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
-int PID_max = 130;    int PID_min = 0;
+int PID_max = 130;    int PID_min = 0;      int PID_Percent = 0;
 
 //-----------------------------------------------------------Frequency---------------------------------------------------------////
 #include <FreqCount.h>
@@ -114,13 +113,14 @@ void loop() {
   time = (millis()) / 1000;
 
   //-----------------------------------------------------------Temperature & PID CONTROL------------------------------------------////
+
+  // Store the previous temperatures incase of an anomoly in the new reading
+  prevTempHeatExchanger = tempHeatExchanger;
+  prevTempTower =  tempTower;
+  prevTempWash =  tempWash;
+  prevTempOutlet = tempOutlet;
   // Read the value of temperature probes
   tempSensors.requestTemperatures();
-  // Store the previous temperatures incase of an anomoly in the new reading
-  prevTempHeatExchanger = tempHeatExchanger
-  prevTempTower =  tempTower
-  prevTempWash =  tempWash
-  prevTempOutlet = tempOutlet
   // Store the actual temperature now
   tempHeatExchanger = tempSensors.getTempC(tempHE);
   tempTower =  tempSensors.getTempC(tempT);
@@ -242,7 +242,8 @@ void loop() {
   if(time > print_time + .5){
 
       print_time = time;
-      PID_Percent = (255 - PID_value)/(255-)                                                    Serial.print(time);                       Serial.print("\t");
+      PID_Percent = (255 - PID_value)/(255);
+      Serial.print(time);         Serial.print("\t");
       Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
       Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
       Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
@@ -253,7 +254,7 @@ void loop() {
       Serial.print("ST:");        Serial.print("\t");     Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
       Serial.print("  STCnt");    Serial.print(",");      Serial.print(setTempCounter);             Serial.print(",");
       Serial.print("  ChkP:");    Serial.print(",");      Serial.print(checkpoint);                 Serial.print(",");
-      Serial.print("PID");        Serial.print("\t");     Serial.print(());  Serial.print("\t");
+      Serial.print("PID");        Serial.print("\t");     Serial.print((PID_value));  Serial.print("\t");
       Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
       Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
       Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.println("\t");
