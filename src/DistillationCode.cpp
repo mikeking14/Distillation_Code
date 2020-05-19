@@ -13,10 +13,6 @@ AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // Accel
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
-<<<<<<< HEAD
-=======
-
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 
 // Pass our oneWire reference to Dallas Temperature.
@@ -38,11 +34,7 @@ float PID_temperature_error[numTempReadings];
 float derivativeTime[numTempReadings];
 float tempDerivative = 0.0;
 
-<<<<<<< HEAD
 float set_temperature = 55.0; //Temperature at which the cooling motor will keep the outlet temperature
-=======
-float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 int setTempCounter = 20;
 int setTempCounterMax = 30;
 float PID_error = 0.0;
@@ -53,19 +45,11 @@ float elapsedTime3, timePrev3;
 int PID_value = 0;
 
 //PID Constants
-<<<<<<< HEAD
 float kp = 8;   float ki = 10;   float kd = 1;
-=======
-float kp = 8;   float ki = 0.90;   float kd = 15;
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 255;    int PID_min = 0;      float PID_Percent = 0.0;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 //-----------------------------------------------------------Frequency---------------------------------------------------------////
 #include <FreqCount.h>
 unsigned long frequency;
@@ -95,11 +79,8 @@ int tempAnomolyCounter = 0;
 unsigned long time = 0;
 float print_time = 0;
 int state = 0;
-<<<<<<< HEAD
 int startup = 1;
 byte byteRead;
-=======
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 
 //-----------------------------------------------------------Function Variables----------------------------------------------------------------////
 //Averaging Function Variables
@@ -130,7 +111,6 @@ void setup() {
   if (LoadCell.getTareStatus() == true) {
     Serial.println("Tare complete");
   }
-<<<<<<< HEAD
 
   //-----------------------------------------------------------Startup Procedure---------------------------------------------------------------///
   Serial.println("Please Zero the Flow Valve by entering:");
@@ -178,37 +158,23 @@ void setup() {
       }
     }
   }
-=======
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 }
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
 void loop() {
-<<<<<<< HEAD
-=======
-
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
   //-----------------------------------------------------------Time---------------------------------------------------------------///
   // Calculate and print the time
   time = (millis()) / 1000;
 
   //-----------------------------------------------------------Temperature & PID CONTROL------------------------------------------////
-<<<<<<< HEAD
-=======
-  // Read the value of temperature probes
-  tempSensors.requestTemperatures();
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
   // Store the previous temperatures incase of an anomoly in the new reading
   prevTempHeatExchanger = tempHeatExchanger;
   prevTempTower =  tempTower;
   prevTempWash =  tempWash;
   prevTempOutlet = tempOutlet;
-<<<<<<< HEAD
   // Read the value of temperature probes
   tempSensors.requestTemperatures();
-=======
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
   // Store the actual temperature now
   tempHeatExchanger = tempSensors.getTempC(tempHE);
   tempTower =  tempSensors.getTempC(tempT);
@@ -231,21 +197,12 @@ void loop() {
   //Calculate the P value
   PID_p = kp * PID_error;
   //Calculate the I value in a range on +-10
-<<<<<<< HEAD
   if (-10 < PID_error < 10){
       PID_i = PID_i + (ki * PID_error);
       if (PID_i > 300){
         PID_i = 300;}
       else if (PID_i < -25){
         PID_i = -25;}
-=======
-  if (-5 < PID_error < 5){
-      PID_i = PID_i + (ki * PID_error);
-      if (PID_i > 100){
-        PID_i = 100;}
-      else if (PID_i < -25){
-        PID_i = -5;}
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
     }
 
   //For derivative we need real time to calculate speed change rate
@@ -263,7 +220,6 @@ void loop() {
     PID_value = PID_min ;}
   if (PID_value > PID_max){
     PID_value = PID_max;}
-<<<<<<< HEAD
   // Calculate the valve position.
   motorSetPosition = -(255-PID_value);
   //Now we can set the valve position
@@ -289,17 +245,6 @@ void loop() {
     Serial.print("\t");
     Serial.println("Negative Direction (More Water)");
     */
-=======
-  //Now we can set the valve position
-
-  motorSetPosition = (255-PID_value)*5; // Calculate the valve position.
-  while(motor.currentPosition() < motorSetPosition) {
-    motor.setSpeed(200);
-    motor.runSpeed();
-  }
-  while(motor.currentPosition() > motorSetPosition) {
-    motor.setSpeed(-200);
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
     motor.runSpeed();
   }
   //Remember to store the previous error for next loop.
@@ -308,12 +253,8 @@ void loop() {
   //-----------------------------------------------------------Frequency-------------------------------------------------------////
 
   if (FreqCount.available()) {
-<<<<<<< HEAD
     frequency = FreqCount.read();
   }
-=======
-    frequency = FreqCount.read();}
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 
   //-----------------------------------------------------------Load Cell-------------------------------------------------------////
 
@@ -370,10 +311,6 @@ void loop() {
         set_temperature += 1;
         setTempCounter = 0;
         checkpoint = time + checkpointIncrement; //Increment for checkpoint
-<<<<<<< HEAD
-=======
-
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
       }
 
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
@@ -383,7 +320,6 @@ void loop() {
       print_time = time;
       PID_Percent = (255 - PID_value)/(255);
       Serial.print(time);         Serial.print("\t");
-<<<<<<< HEAD
       Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
       //Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
       Serial.print("PID ER:");    Serial.print("\t");     Serial.print(PID_error);                  Serial.print("\t");
@@ -403,25 +339,6 @@ void loop() {
       Serial.print("ChkP:");      Serial.print(",");      Serial.println(checkpoint);
 
 
-=======
-      Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
-      Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
-      Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
-      Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
-      Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
-      Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
-      Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
-      Serial.print("ST:");        Serial.print("\t");     Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
-      Serial.print("  STCnt");    Serial.print(",");      Serial.print(setTempCounter);             Serial.print(",");
-      Serial.print("  ChkP:");    Serial.print(",");      Serial.print(checkpoint);                 Serial.println(",");
-
-/*
-      Serial.print("PID");        Serial.print("\t");     Serial.print(PID_value);                  Serial.print("\t");
-      Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
-      Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
-      Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.println("\t");
-*/
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
 
       /*
       if (tempAnomolyCounter > 10)
@@ -469,8 +386,4 @@ float storeError(float input, float timeMillis) {
 
   PID_temperature_error[2] = input;
   derivativeTime[2] = timeMillis;
-<<<<<<< HEAD
   }
-=======
-  };
->>>>>>> 8520a2a8484433c4fdb620be69e369aa38bcc467
