@@ -45,7 +45,7 @@ float elapsedTime3, timePrev3;
 int PID_value = 0;
 
 //PID Constants
-float kp = 8;   float ki = 10;   float kd = 1;
+float kp = 8;   float ki = 1;   float kd = 18;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 255;    int PID_min = 0;      float PID_Percent = 0.0;
@@ -64,7 +64,7 @@ float mass = 0.0;
 float averageMass = 0.0;
 float massRate = 0.0;
 float prevMass = 0.0;
-float minMassRate = 0.2;
+float minMassRate = 0.1;
 int checkpointConst = 10000;
 int checkpoint = checkpointConst;
 int checkpointIncrement = 50;
@@ -104,7 +104,7 @@ void setup() {
 
   Time = millis();
 
-  long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
+  long stabilisingtime = 1000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
   // Check if last tare operation is complete
@@ -114,8 +114,8 @@ void setup() {
 
   //-----------------------------------------------------------Startup Procedure---------------------------------------------------------------///
   Serial.println("Please Zero the Flow Valve by entering:");
-  Serial.println("1 for Less water");
-  Serial.println("2 for More water");
+  Serial.println("1 for More water");
+  Serial.println("2 for Less water");
   Serial.println("Press 9 to resume");
 
   // Startup Sequence to Calibrate water flow to near Zero flow:
@@ -127,29 +127,31 @@ void setup() {
       byteRead = Serial.read()- '0';
       // Open the valve by pressing 2
       if (byteRead == 1) {
-        Serial.println("More Water");
+        Serial.print(" More Water ");
         // Set the current position to 0:
           motor.setCurrentPosition(0);
         // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != 100) {
+        while(motor.currentPosition() != 25) {
           motor.setSpeed(200);
           motor.runSpeed();
           }
       }
       // Close the valve more by pressing 2
       if (byteRead == 2){
-        Serial.println("Less Water");
+        Serial.print(" Less Water ");
         // Set the current position to 0:
         motor.setCurrentPosition(0);
         // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != -100) {
+        while(motor.currentPosition() != -25) {
           motor.setSpeed(-200);
           motor.runSpeed();
           }
+
       }
       //Set the motor current position to zero and leave setup
       if(byteRead == 9){
-        Serial.println("MotorPosition = 0");
+        Serial.println("MotorPosition:");
+        Serial.println(motor.currentPosition());
         motor.setCurrentPosition(0);
         Serial.println("Startup = 0");
         startup = 0;
@@ -197,12 +199,12 @@ void loop() {
   //Calculate the P value
   PID_p = kp * PID_error;
   //Calculate the I value in a range on +-10
-  if (-10 < PID_error < 10){
+  if (-5 < PID_error < 5){
       PID_i = PID_i + (ki * PID_error);
-      if (PID_i > 300){
-        PID_i = 300;}
-      else if (PID_i < -25){
-        PID_i = -25;}
+      if (PID_i > 150){
+        PID_i = 150;}
+      else if (PID_i < -15){
+        PID_i = -15;}
     }
 
   //For derivative we need real time to calculate speed change rate
@@ -220,31 +222,22 @@ void loop() {
     PID_value = PID_min ;}
   if (PID_value > PID_max){
     PID_value = PID_max;}
-  // Calculate the valve position.
-  motorSetPosition = -(255-PID_value);
+
   //Now we can set the valve position
-  while((motor.currentPosition()+5) > motorSetPosition) {
+  if(tempTower + 30 < set_temperature){
+    motorSetPosition = 50;
+  }
+  else{
+    // Calculate the valve position.
+    motorSetPosition = (255-PID_value);
+  }
+
+  while(motor.currentPosition() > motorSetPosition && motor.currentPosition() > 0) {
     motor.setSpeed(-200); // Less water
-/*    Serial.print("Motor Set Position: ");
-    Serial.print(motorSetPosition);
-    Serial.print("\t");
-    Serial.print("Motor Current Position: ");
-    Serial.print(motor.currentPosition());
-    Serial.print("\t");
-    Serial.println("Positive Direction (Less Water)");
-    */
     motor.runSpeed();
   }
-  while(motor.currentPosition()-5 < motorSetPosition) {
+  while(motor.currentPosition() < motorSetPosition && motor.currentPosition() < 800) {
     motor.setSpeed(200); // More Water
-/*    Serial.print("Motor Set Position: ");
-    Serial.print(motorSetPosition);
-    Serial.print("\t");
-    Serial.print("Motor Current Position: ");
-    Serial.print(motor.currentPosition());
-    Serial.print("\t");
-    Serial.println("Negative Direction (More Water)");
-    */
     motor.runSpeed();
   }
   //Remember to store the previous error for next loop.
@@ -298,11 +291,17 @@ void loop() {
           //Only increment if distillation has started
           setTempCounter += 1;
           //Keep the counter at the max level
-          if(setTempCounter > setTempCounterMax) {setTempCounter = setTempCounterMax;}
+          if(setTempCounter > setTempCounterMax) {
+            setTempCounter = setTempCounterMax;
+          }
         }
         else{
-          if(setTempCounter > 0){setTempCounter -= 1;}
-          else{setTempCounter = 0;}
+          if(setTempCounter > 0){
+            setTempCounter -= 1;
+          }
+          else{
+            setTempCounter = 0;
+          }
         }
       }
 
@@ -321,14 +320,14 @@ void loop() {
       PID_Percent = (255 - PID_value)/(255);
       Serial.print(time);         Serial.print("\t");
       Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
-      //Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
+      Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
       Serial.print("PID ER:");    Serial.print("\t");     Serial.print(PID_error);                  Serial.print("\t");
       Serial.print("PID");        Serial.print("\t");     Serial.print(PID_value);                  Serial.print("\t");
       Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
       Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
       Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.print("\t");
       //Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
-      //Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
+      Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
       //Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
       Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
       Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
