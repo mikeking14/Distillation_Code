@@ -201,7 +201,8 @@ void loop() {
   //Calculate the I value in a range on +-10
   if (-5 < PID_error < 5){
       PID_i = PID_i + (ki * PID_error);
-      if (PID_i > 150){
+      if (PID_i > 150
+      ){
         PID_i = 150;}
       else if (PID_i < -15){
         PID_i = -15;}
@@ -318,7 +319,7 @@ void loop() {
 
       print_time = time;
       PID_Percent = (255 - PID_value)/(255);
-      Serial.print(time);         Serial.print("\t");
+      //Serial.print(time);         Serial.print("\t");
       Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
       Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
       Serial.print("PID ER:");    Serial.print("\t");     Serial.print(PID_error);                  Serial.print("\t");
@@ -328,10 +329,10 @@ void loop() {
       Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.print("\t");
       //Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
       Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
-      //Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
+      Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
       Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
       Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
-      //Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
+      Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
       Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
       Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
       Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
