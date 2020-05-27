@@ -1,64 +1,51 @@
-clc;
-clear;
+clear; close all; clc;
 
 %% Import Arduino Data
-    % Setup the Import Options
-        opts = delimitedTextImportOptions("NumVariables", 25);
+        % Setup the Import Options and import the data
+        opts = delimitedTextImportOptions("NumVariables", 37);
 
-    % Specify range and delimiter
+        % Specify range and delimiter
         opts.DataLines = [1, Inf];
-        opts.Delimiter = ",";
+        opts.Delimiter = ["\t", " ", ","];
 
-    % Specify column names and types
-        opts.VariableNames = ["Time", "VarName2", "Heat_Exchanger_Temp", "VarName4", "Tower_Temp", "VarName6", "Wash_Temp", "VarName8", "Outlet_Temp", "VarName10", "Mass", "VarName12", "Mass_Delta", "VarName14", "Frequency", "VarName16", "Set_Temp", "VarName18", "PID", "VarName20", "P", "VarName22", "I", "VarName24", "D"];
-        opts.VariableTypes = ["string", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double", "categorical", "double"];
-        opts = setvaropts(opts, 1, "WhitespaceRule", "preserve");
-        opts = setvaropts(opts, [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24], "EmptyFieldRule", "auto");
+        % Specify column names and types
+        opts.VariableNames = ["Time", "Var2", "Var3", "SetPoint", "Var5", "CurrentSetPosition", "Var7", "Var8", "PID_Error", "Var10", "PID", "Var12", "P", "Var14", "I", "Var16", "D", "Var18", "Wash_Temp", "Var20", "Outlet_Temp", "Var22", "Var23", "Mass", "Var25", "Var26", "Mass_Delta", "Var28", "Frequency", "Var30", "Tower_Temp", "Var32", "SetTemp", "Var34", "SetTempCounter", "Var36", "CheckPoint"];
+        opts.SelectedVariableNames = ["Time", "SetPoint", "CurrentSetPosition", "PID_Error", "PID", "P", "I", "D", "Wash_Temp", "Outlet_Temp", "Mass", "Mass_Delta", "Frequency", "Tower_Temp", "SetTemp", "SetTempCounter", "CheckPoint"];
+        opts.VariableTypes = ["datetime", "string", "string", "double", "string", "double", "string", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "string", "double", "string", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double"];
+
+        % Specify file level properties
+        opts.ImportErrorRule = "omitrow";
+        opts.MissingRule = "omitrow";
         opts.ExtraColumnsRule = "ignore";
         opts.EmptyLineRule = "read";
 
-    % Import the data
-        arduino = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run28/Distillation_Run_28_Proccessed.csv", opts);
+        % Specify variable properties
+        opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var7", "Var8", "Var10", "Var12", "Var14", "Var16", "Var18", "Var20", "Var22", "Var23", "Var25", "Var26", "Var28", "Var30", "Var32", "Var34", "Var36"], "WhitespaceRule", "preserve");
+        opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var7", "Var8", "Var10", "Var12", "Var14", "Var16", "Var18", "Var20", "Var22", "Var23", "Var25", "Var26", "Var28", "Var30", "Var32", "Var34", "Var36"], "EmptyFieldRule", "auto");
+        opts = setvaropts(opts, "Time", "InputFormat", "HH:mm:ss.SSS");
+
+        % Import the data
+        arduino = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run35/DistillationRun35_Arduino2.txt", opts);
         clear opts
 
  %% Import DMM Data
-     % Setup the Import Options
+        % Setup the Import Options and import the data
         opts = spreadsheetImportOptions("NumVariables", 2);
 
-     % Specify sheet and range
-        opts.Sheet = "sheet1";
-        opts.DataRange = "A2:B4795";
+        % Specify sheet and range
+        opts.Sheet = "Reservoir";
+        opts.DataRange = "A2:B15467";
 
-     % Specify column names and types
-        opts.VariableNames = ["Time", "Untitled"];
-        opts.SelectedVariableNames = ["Time", "Untitled"];
-        opts.VariableTypes = ["datetime", "double"];
-        opts = setvaropts(opts, 1, "InputFormat", "");
+        % Specify column names and types
+        opts.VariableNames = ["Resistance", "Time"];
+        opts.VariableTypes = ["double", "datetime"];
 
-     % Import the data
-        DMM = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run32/DistillationRun32_DMM.xlsx", opts, "UseExcel", false);
+        % Specify variable properties
+        opts = setvaropts(opts, "Time", "InputFormat", "");
+
+        % Import the data
+        DMM = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run35/DistillationRun35_DMM.xlsx", opts, "UseExcel", false);
         clear opts
-
-%% Input variables from arduino
-    %Create and format datetime variable from arduino
-    arduino_Time = table2array(arduino(:,1));
-    arduino_Time = extractBefore(arduino_Time,13);
-    arduino_Time = datetime(arduino_Time,'InputFormat', 'HH:mm:ss.SSS');
-    arduino_Time.Month = 8;
-    arduino_Time.Day = 27;
-    arduino_Time.Format = 'default';
-
-    %Add the datetime for arduino to the arduino table
-    arduino{:,26} = arduino_Time;
-    arduino(:,[2,4,6,8,10,12,14,16,18,20,22,24]) = [];
-    arduino(:,1) = [];
-%% Input variables from DMM
-    dmm_Time = table2array(DMM(:,1));
-    dmm_Time= datetime(dmm_Time,'InputFormat','yyy-MM-dd HH:mm:ss.SSS');
-    dmm_Time.Format = 'default';
-    DMM{:,3} = dmm_Time;
-    DMM(:,1) = [];
-    DMM.Properties.VariableNames({'Untitled', 'Var3'}) = {'Resistivity', 'DMM_Time'};
 
 %% Data Proccessing
 
@@ -75,24 +62,24 @@ clear;
     mass_Med_Smooth = smoothdata(data.Mass, 'movmedian', 30);
     mass_Smooth=smoothdata(mass_Med_Smooth,'movmean',10);
 
-    mass_Rate_Med_Smooth = smoothdata(data.Mass_Delta, 'movmedian', 80)
+    mass_Rate_Med_Smooth = smoothdata(data.Mass_Delta, 'movmedian', 80);
     mass_Rate_Smooth = smoothdata(mass_Rate_Med_Smooth, 'movmean', 60);
 
     %Frequency
-    freq_Med_Smooth = smoothdata(data.Frequency, 'movmedian', 10)
+    freq_Med_Smooth = smoothdata(data.Frequency, 'movmedian', 10);
     freq_Smooth = smoothdata(freq_Med_Smooth, 'movmean', 30);
 
     %Temperature
-    tower_Temp_Med_Smooth = smoothdata(data.Tower_Temp, 'movmedian', 5)
+    tower_Temp_Med_Smooth = smoothdata(data.Tower_Temp, 'movmedian', 5);
     tower_Temp_Smooth = smoothdata(tower_Temp_Med_Smooth, 'movmean', 10);
 
-    wash_Temp_Med_Smooth = smoothdata(data.Wash_Temp, 'movmedian', 5)
+    wash_Temp_Med_Smooth = smoothdata(data.Wash_Temp, 'movmedian', 5);
     wash_Temp_Smooth = smoothdata(wash_Temp_Med_Smooth, 'movmean', 10);
 
-    outlet_Temp_Med_Smooth = smoothdata(data.Outlet_Temp, 'movmedian', 5)
+    outlet_Temp_Med_Smooth = smoothdata(data.Outlet_Temp, 'movmedian', 5);
     outlet_Temp_Smooth = smoothdata(outlet_Temp_Med_Smooth, 'movmean', 10);
 
-    resistivity_Med_Smooth = smoothdata(data.Resistivity, 'movmedian', 20)
+    resistivity_Med_Smooth = smoothdata(data.Resistance, 'movmedian', 20);
     resistivity_Smooth = smoothdata(resistivity_Med_Smooth, 'movmean', 10);
 
 %% Plotting
@@ -101,7 +88,7 @@ clear;
         figure
         hold on
         title 'Frequency, Mass, Temperature'
-        xlim([-1000  21000])
+        xlim([0  400])
         xlabel 'Time'
 
         % Left side of graph
@@ -129,7 +116,7 @@ clear;
         figure
         hold on
         title 'Frequency vs Mass'
-        xlim([0  1600])
+        xlim([0  400])
         xlabel 'Mass'
 
         % Left side of graph
@@ -142,12 +129,6 @@ clear;
             ylabel 'Mass / Tower Temp'
             ylim([50 120])
             plot(mass_Smooth, tower_Temp_Smooth, '-r')
-
-        %Vertical Lines
-            xl = xline(80,'--k');
-            xl.LabelVerticalAlignment = 'middle';
-            xl = xline(1495,'--k');
-            xl.LabelVerticalAlignment = 'middle';
 
  legend({'Frequency', 'Tower Temp'},'Location','Northeast')
  hold off
