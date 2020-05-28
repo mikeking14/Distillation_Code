@@ -34,7 +34,7 @@ float PID_temperature_error[numTempReadings];
 float derivativeTime[numTempReadings];
 float tempDerivative = 0.0;
 
-float set_temperature = 55.0; //Temperature at which the cooling motor will keep the outlet temperature
+float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
 int setTempCounter = 20;
 int setTempCounterMax = 30;
 float PID_error = 0.0;
@@ -68,6 +68,7 @@ float minMassRate = 0.1;
 int checkpointConst = 10000;
 int checkpoint = checkpointConst;
 int checkpointIncrement = 50;
+long stabilisingtime = 10000; // tare preciscion can be improved by adding a few seconds of stabilising time
 
 //-----------------------------------------------------------Other----------------------------------------------------------------////
 //Epsilon Constants
@@ -104,7 +105,6 @@ void setup() {
 
   Time = millis();
 
-  long stabilisingtime = 1000; // tare preciscion can be improved by adding a few seconds of stabilising time
   LoadCell.start(stabilisingtime);
   LoadCell.setCalFactor(416.0); // user set calibration factor (float)
   // Check if last tare operation is complete
