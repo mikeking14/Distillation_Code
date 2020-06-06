@@ -36,7 +36,7 @@ float tempDerivative = 0.0;
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
 int setTempCounter = 20;
-int setTempCounterMax = 30;
+int setTempCounterMax = 50;
 float PID_error = 0.0;
 float previous_error = 0.0;
 float elapsedTime, Time, timePrev, timeLeft;
@@ -45,7 +45,7 @@ float elapsedTime3, timePrev3;
 int PID_value = 0;
 
 //PID Constants
-float kp = 8;   float ki = 1;   float kd = 18;
+float kp = 15;   float ki = 0.5;   float kd = 10;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 255;    int PID_min = 0;      float PID_Percent = 0.0;
@@ -201,11 +201,11 @@ void loop() {
   //Calculate the I value in a range on +-10
   if (-5 < PID_error < 5){
       PID_i = PID_i + (ki * PID_error);
-      if (PID_i > 150
+      if (PID_i > 300
       ){
-        PID_i = 150;}
-      else if (PID_i < -15){
-        PID_i = -15;}
+        PID_i = 300;}
+      else if (PID_i < -25){
+        PID_i = -25;}
     }
 
   //For derivative we need real time to calculate speed change rate
