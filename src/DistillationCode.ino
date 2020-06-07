@@ -337,7 +337,7 @@ void loop() {
       Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
       Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
       Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);
-      Serial.print("Anomoly:")    Serial.print("\t")      Serial.println(tempAnomolyCounter)
+      Serial.print("Anomoly:");   Serial.print("\t");     Serial.println(tempAnomolyCounter);
 
       }
 
