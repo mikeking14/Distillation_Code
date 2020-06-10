@@ -48,7 +48,7 @@ int PID_value = 0;
 float kp = 15;   float ki = 1;   float kd = 10;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
-int PID_max = 255;    int PID_min = 0;      float PID_Percent = 0.0;
+int PID_max = 1000;    int PID_min = 0;      float PID_Percent = 0.0;
 
 //-----------------------------------------------------------Frequency---------------------------------------------------------////
 #include <FreqCount.h>
@@ -67,8 +67,8 @@ float prevMass = 0.0;
 float minMassRate = 0.1;
 int checkpointConst = 10000;
 int checkpoint = checkpointConst;
-int checkpointIncrement = 50;
-long stabilisingtime = 10000; // tare preciscion can be improved by adding a few seconds of stabilising time
+int checkpointIncrement = 100;
+long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
 
 //-----------------------------------------------------------Other----------------------------------------------------------------////
 //Epsilon Constants
