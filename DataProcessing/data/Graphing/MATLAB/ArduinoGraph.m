@@ -1,3 +1,31 @@
+clear; close all; clc;
+%% Initialize Workspace
+        runNumber = 39;
+
+%% Import Arduino Data
+        
+        % Specify Filepath
+        str = "/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run";
+        str2 = num2str(runNumber);
+        str3 = "/DistillationRun";
+        str4 = "_Arduino.txt";
+        
+        % Import Arduino data
+        Arduinofilename = append(str,str2,str3,str2,str4);
+        arduino = importArduinoFile(Arduinofilename);
+        
+
+%% Import DMM Data
+       
+        % Specify Filepath
+        str5 = "_DMM.txt";
+        DMMfilename = append(str,str2,str3,str2,str5);
+        % Import DMM data
+        DMM = importDMMfile(DMMfilename);
+       
+        
+%% Data Preparation 
+ 
     mass_Med_Smooth = smoothdata(arduino.Mass, 'movmedian', 30);
     mass_Smooth=smoothdata(mass_Med_Smooth,'movmean',10);
 
@@ -19,7 +47,8 @@
     outlet_Temp_Smooth = smoothdata(outlet_Temp_Med_Smooth, 'movmean', 10);
     
     
-    %% Plotting
+%% Plotting
+    
     %Frequency/Mass/Resistivity vs Time
         close all
         figure
@@ -30,8 +59,7 @@
         % Left side of graph
             yyaxis left
             ylabel 'Frequency'
-            ylim([120000 170000])
-            %ylim([0 5000000])
+            ylim([120000 140000])
             plot(freq_Smooth, '-b')
             %plot(resistivity_Smooth/5, 'g')
         % Right side of graph
@@ -58,20 +86,20 @@
         xlabel 'Time'
         
         
-        yyaxis left
+        %yyaxis left
         ylabel 'Temperature'
         plot(arduino.SetTemp, '--red')
         plot(arduino.Tower_Temp, '-red')
+        legend({'Set Temp','Tower Temp'})
 
-
-        yyaxis right
-        ylabel 'PID Variables'
-        ylim([-100 300])
-        plot(arduino.PID)
-        plot(arduino.PID_Error,'black')
-        plot(arduino.P, '-m')
-        plot(arduino.I, '-b')
-        plot(arduino.D, 'c')
-        
-        legend({'Set Temp','Tower Temp', 'PID', 'PID ERROR','P','I', 'D' },'Location','Northwest')
+%         yyaxis right
+%         ylabel 'PID Variables'
+%         ylim([-100 300])
+%         plot(arduino.PID)
+%         plot(arduino.PID_Error,'black')
+%         plot(arduino.P, '-m')
+%         plot(arduino.I, '-b')
+%         plot(arduino.D, 'c')
+%         
+%         legend({'Set Temp','Tower Temp', 'PID', 'PID ERROR','P','I', 'D' },'Location','Northwest')
 

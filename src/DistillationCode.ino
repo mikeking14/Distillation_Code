@@ -45,7 +45,7 @@ float elapsedTime3, timePrev3;
 int PID_value = 0;
 
 //PID Constants
-float kp = 18;   float ki = 0.5;   float kd = 10;
+float kp = 15;   float ki = 1;   float kd = 10;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 255;    int PID_min = 0;      float PID_Percent = 0.0;
@@ -204,8 +204,8 @@ void loop() {
       if (PID_i > 300
       ){
         PID_i = 300;}
-      else if (PID_i < -25){
-        PID_i = -25;}
+      else if (PID_i < -50){
+        PID_i = -50;}
     }
 
   //For derivative we need real time to calculate speed change rate
@@ -336,7 +336,7 @@ void loop() {
       Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
       Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
       Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
-      Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);
+      Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);                 Serial.print("\t");
       Serial.print("Anomoly:");   Serial.print("\t");     Serial.println(tempAnomolyCounter);
 
       }

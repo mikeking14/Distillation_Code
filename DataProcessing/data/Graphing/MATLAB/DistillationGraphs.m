@@ -1,65 +1,31 @@
 clear; close all; clc;
 %% Initialize Workspace
-        runNumber = 38
+        runNumber = 39;
 
 %% Import Arduino Data
-        % Setup the Import Options and import the data
-        opts = delimitedTextImportOptions("NumVariables", 37);
-
-        % Specify range and delimiter
-        opts.DataLines = [1, Inf];
-        opts.Delimiter = ["\t", " ", ","];
-
-        % Specify column names and types
-        opts.VariableNames = ["Time", "Var2", "Var3", "SetPoint", "Var5", "CurrentSetPosition", "Var7", "Var8", "PID_Error", "Var10", "PID", "Var12", "P", "Var14", "I", "Var16", "D", "Var18", "Wash_Temp", "Var20", "Outlet_Temp", "Var22", "Var23", "Mass", "Var25", "Var26", "Mass_Delta", "Var28", "Frequency", "Var30", "Tower_Temp", "Var32", "SetTemp", "Var34", "SetTempCounter", "Var36", "CheckPoint"];
-        opts.SelectedVariableNames = ["Time", "SetPoint", "CurrentSetPosition", "PID_Error", "PID", "P", "I", "D", "Wash_Temp", "Outlet_Temp", "Mass", "Mass_Delta", "Frequency", "Tower_Temp", "SetTemp", "SetTempCounter", "CheckPoint"];
-        opts.VariableTypes = ["datetime", "string", "string", "double", "string", "double", "string", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "string", "double", "string", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double", "string", "double"];
-
-        % Specify file level properties
-        opts.ImportErrorRule = "omitrow";
-        opts.MissingRule = "omitrow";
-        opts.ExtraColumnsRule = "ignore";
-        opts.EmptyLineRule = "read";
-
-        % Specify variable properties
-        opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var7", "Var8", "Var10", "Var12", "Var14", "Var16", "Var18", "Var20", "Var22", "Var23", "Var25", "Var26", "Var28", "Var30", "Var32", "Var34", "Var36"], "WhitespaceRule", "preserve");
-        opts = setvaropts(opts, ["Var2", "Var3", "Var5", "Var7", "Var8", "Var10", "Var12", "Var14", "Var16", "Var18", "Var20", "Var22", "Var23", "Var25", "Var26", "Var28", "Var30", "Var32", "Var34", "Var36"], "EmptyFieldRule", "auto");
-        opts = setvaropts(opts, "Time", "InputFormat", "HH:mm:ss.SSS");
-
-        % Import the data
+        
+        % Specify Filepath
         str = "/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run";
         str2 = num2str(runNumber);
         str3 = "/DistillationRun";
         str4 = "_Arduino.txt";
-        ArduinoData = append(str,str2,str3,str2,str4);
         
-        arduino = readtable(ArduinoData, opts);
-        clear opts
+        % Import Arduino data
+        Arduinofilename = append(str,str2,str3,str2,str4);
+        arduino = importArduinoFile(Arduinofilename);
+        
 
  %% Import DMM Data
-        % Setup the Import Options and import the data
-        opts = spreadsheetImportOptions("NumVariables", 2);
+       
+        % Specify Filepath
+        str5 = "_DMM.txt";
+        DMMfilename = append(str,str2,str3,str2,str5);
+        % Import DMM data
+        DMM = importDMMfile(DMMfilename);
 
-        % Specify sheet and range
-        opts.Sheet = "Reservoir";
-        opts.DataRange = "A2:B15467";
 
-        % Specify column names and types
-        opts.VariableNames = ["Resistance", "Time"];
-        opts.VariableTypes = ["double", "datetime"];
-
-        % Specify variable properties
-        opts = setvaropts(opts, "Time", "InputFormat", "");
-
-        % Import the data
-        str5 = "_DMM.txt"
-        DMMData = append(str,str2,str3,str2,str5)
-        DMM = readtable("/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run36/DistillationRun36_DMM.xlsx", opts, "UseExcel", false);
-        clear opts
-
-%% Data Proccessing
-
-% Combine the Arduino and DMM data into one table
+%% Combine the Arduino and DMM data
+    
     %Convert the arduino and DMM data into timetables so that they can be
     %passed to the synchronize function
     arduino_Timetable = table2timetable(arduino);
@@ -67,7 +33,8 @@ clear; close all; clc;
     % Synchronize the two data steams into a timetable called data
     data = synchronize(arduino_Timetable,DMM_Timetable, 'union', 'linear');
 
-% Smooth the data
+%% Smooth these data
+    
     %Mass
     mass_Med_Smooth = smoothdata(data.Mass, 'movmedian', 30);
     mass_Smooth=smoothdata(mass_Med_Smooth,'movmean',10);
@@ -92,6 +59,7 @@ clear; close all; clc;
     resistivity_Med_Smooth = smoothdata(data.Resistance, 'movmedian', 20);
     resistivity_Smooth = smoothdata(resistivity_Med_Smooth, 'movmean', 10);
 
+    
 %% Plotting
     %Frequency/Mass/Resistivity vs Time
         close all
