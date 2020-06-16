@@ -132,36 +132,7 @@ void loop() {
   tempWash = tempSensors.getTempC(tempW);
   tempOutlet = tempSensors.getTempC(tempO);
 
-  //Next we calculate the error between the setpoint and the real value
-  PID_error = set_temperature - tempTower;
-  storeError(PID_error, millis());
-  //Calculate the P value
-  PID_p = kp * PID_error;
-  //Calculate the I value in a range on +-10
-  if (-5 < PID_error < 5){
-      PID_i = PID_i + (ki * PID_error);
-      if (PID_i > 300
-      ){
-        PID_i = 300;}
-      else if (PID_i < -50){
-        PID_i = -50;}
-    }
-
-  //For derivative we need real time to calculate speed change rate
-  timePrev = Time;                            // the previous time is stored before the actual time read
-  Time = millis();                            // actual time read
-  elapsedTime = (Time - timePrev) / 1000;
-  //Now we can calculate the D value
-  PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
-
-  //Final total PID value is the sum of P + I + D
-  PID_value = PID_p + PID_i + PID_d;
-
-  //We define PID range between 0 and 255
-  if (PID_value < PID_min){
-    PID_value = PID_min ;}
-  if (PID_value > PID_max){
-    PID_value = PID_max;}
+  calculatePID();
 
   //Now we can set the valve position
   if(tempTower + 30 < set_temperature){
@@ -338,6 +309,39 @@ void getMass() {
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay();
   }
+}
+
+void calculatePID() {
+  //Next we calculate the error between the setpoint and the real value
+  PID_error = set_temperature - tempTower;
+  storeError(PID_error, millis());
+  //Calculate the P value
+  PID_p = kp * PID_error;
+  //Calculate the I value in a range on +-10
+  if (-5 < PID_error < 5){
+      PID_i = PID_i + (ki * PID_error);
+      if (PID_i > 300
+      ){
+        PID_i = 300;}
+      else if (PID_i < -50){
+        PID_i = -50;}
+    }
+
+  //For derivative we need real time to calculate speed change rate
+  timePrev = Time;                            // the previous time is stored before the actual time read
+  Time = millis();                            // actual time read
+  elapsedTime = (Time - timePrev) / 1000;
+  //Now we can calculate the D value
+  PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
+
+  //Final total PID value is the sum of P + I + D
+  PID_value = PID_p + PID_i + PID_d;
+
+  //We define PID range between 0 and 255
+  if (PID_value < PID_min){
+    PID_value = PID_min ;}
+  if (PID_value > PID_max){
+    PID_value = PID_max;}
 }
 
 
