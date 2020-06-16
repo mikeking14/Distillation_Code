@@ -67,7 +67,7 @@ float minMassRate = 0.1;
 int checkpointConst = 10000;
 int checkpoint = checkpointConst;
 int checkpointIncrement = 100;
-long stabilisingtime = 15000; // tare preciscion can be improved by adding a few seconds of stabilising time
+long stabilisingtime = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
 
 //-----------------------------------------------------------Other----------------------------------------------------------------////
 //Epsilon Constants
@@ -111,53 +111,9 @@ void setup() {
   }
 
   //-----------------------------------------------------------Startup Procedure---------------------------------------------------------------///
-  Serial.println("Please Zero the Flow Valve by entering:");
-  Serial.println("1 for More water");
-  Serial.println("2 for Less water");
-  Serial.println("Press 9 to resume");
 
-  // Startup Sequence to Calibrate water flow to near Zero flow:
-      // You will need some flow as the temperature of this water used
-      // to measure the temperature for the control system
-  while(startup == 1){
-    if (Serial.available()) {
-      // Read the most recent byte from the serial monitor
-      byteRead = Serial.read()- '0';
-      // Open the valve by pressing 2
-      if (byteRead == 1) {
-        Serial.print(" More Water ");
-        // Set the current position to 0:
-          motor.setCurrentPosition(0);
-        // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != 25) {
-          motor.setSpeed(200);
-          motor.runSpeed();
-          }
-      }
-      // Close the valve more by pressing 2
-      if (byteRead == 2){
-        Serial.print(" Less Water ");
-        // Set the current position to 0:
-        motor.setCurrentPosition(0);
-        // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != -25) {
-          motor.setSpeed(-200);
-          motor.runSpeed();
-          }
+  startupSequence();
 
-      }
-      //Set the motor current position to zero and leave setup
-      if(byteRead == 9){
-        Serial.println("MotorPosition:");
-        Serial.println(motor.currentPosition());
-        motor.setCurrentPosition(0);
-        Serial.println("Startup = 0");
-        startup = 0;
-        Serial.println("Break");
-        break;
-      }
-    }
-  }
 }
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
@@ -235,26 +191,7 @@ void loop() {
 
   //-----------------------------------------------------------Load Cell-------------------------------------------------------////
 
-  // Update() should be called at least as often as HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS
-  // Longer delay in sketch will reduce effective sample rate (be carefull with delay() in loop)
-  LoadCell.update();
-  // Get smoothed value from data set + current calibration factor
-  float mass = LoadCell.getData() * -1;
-  t = millis();
-  // Calculate the mass flow rate
-  averageMass = calculateAverage(mass);
-  elapsedTime2 = (t - timePrev2) / 1000;
-  if (elapsedTime2 > 1) {
-    massRate = (averageMass - prevMass) / elapsedTime2;
-    timePrev2 = t;
-    prevMass = averageMass;
-  }
-  // Receive from serial terminal
-  if (Serial.available() > 0) {
-    float mass;
-    char inByte = Serial.read();
-    if (inByte == 't') LoadCell.tareNoDelay();
-  }
+  getMass();
 
   //-----------------------------------------------------------Set Temperarure Incrementer-------------------------------------------------------////
 
@@ -300,12 +237,109 @@ void loop() {
 
 
       printData();
-      
+
 
 }
 
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Functions-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+
+void startupSequence() {
+
+  Serial.println("Please Zero the Flow Valve by entering:");
+  Serial.println("1 for More water");
+  Serial.println("2 for Less water");
+  Serial.println("Press 9 to resume");
+
+  // Startup Sequence to Calibrate water flow to near Zero flow:
+      // You will need some flow as the temperature of this water used
+      // to measure the temperature for the control system
+  while(startup == 1){
+    if (Serial.available()) {
+      // Read the most recent byte from the serial monitor
+      byteRead = Serial.read()- '0';
+      // Open the valve by pressing 2
+      if (byteRead == 1) {
+        Serial.print(" More Water ");
+        // Set the current position to 0:
+          motor.setCurrentPosition(0);
+        // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
+        while(motor.currentPosition() != 25) {
+          motor.setSpeed(200);
+          motor.runSpeed();
+          }
+      }
+      // Close the valve more by pressing 2
+      if (byteRead == 2){
+        Serial.print(" Less Water ");
+        // Set the current position to 0:
+        motor.setCurrentPosition(0);
+        // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
+        while(motor.currentPosition() != -25) {
+          motor.setSpeed(-200);
+          motor.runSpeed();
+          }
+
+      }
+      //Set the motor current position to zero and leave setup
+      if(byteRead == 9){
+        Serial.println("MotorPosition:");
+        Serial.println(motor.currentPosition());
+        motor.setCurrentPosition(0);
+        Serial.println("Startup = 0");
+        startup = 0;
+        Serial.println("Break");
+        break;
+      }
+    }
+  }
+}
+
+void printData() {
+
+  Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
+  Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
+  Serial.print("PID ER:");    Serial.print("\t");     Serial.print(PID_error);                  Serial.print("\t");
+  Serial.print("PID");        Serial.print("\t");     Serial.print(PID_value);                  Serial.print("\t");
+  Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
+  Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
+  Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.print("\t");
+  //Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
+  Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
+  Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
+  Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
+  Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
+  Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
+  Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
+  Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t");
+  Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
+  Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);                 Serial.println("\t");
+
+}
+
+void getMass() {
+  // Update() should be called at least as often as HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS
+  // Longer delay in sketch will reduce effective sample rate (be carefull with delay() in loop)
+  LoadCell.update();
+  // Get smoothed value from data set + current calibration factor
+  float mass = LoadCell.getData() * -1;
+  t = millis();
+  // Calculate the mass flow rate
+  averageMass = calculateAverage(mass);
+  elapsedTime2 = (t - timePrev2) / 1000;
+  if (elapsedTime2 > 1) {
+    massRate = (averageMass - prevMass) / elapsedTime2;
+    timePrev2 = t;
+    prevMass = averageMass;
+  }
+  // Receive from serial terminal
+  if (Serial.available() > 0) {
+    float mass;
+    char inByte = Serial.read();
+    if (inByte == 't') LoadCell.tareNoDelay();
+  }
+}
+
 
 float calculateAverage(float input) {
   // subtract the last reading:
@@ -340,25 +374,3 @@ float storeError(float input, float timeMillis) {
   PID_temperature_error[2] = input;
   derivativeTime[2] = timeMillis;
   }
-
-void printData() {
-
-  Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
-  Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
-  Serial.print("PID ER:");    Serial.print("\t");     Serial.print(PID_error);                  Serial.print("\t");
-  Serial.print("PID");        Serial.print("\t");     Serial.print(PID_value);                  Serial.print("\t");
-  Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
-  Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
-  Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.print("\t");
-  //Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
-  Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
-  Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
-  Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
-  Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
-  Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
-  Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
-  Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t");
-  Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
-  Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);                 Serial.println("\t");
-
-}
