@@ -1,20 +1,33 @@
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Libraries and Variables-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
-//-----------------------------------------------------------Motor---------------------------------------------------------////
+// --- Libraries and instances --- //
+
+// Motor
 #include <AccelStepper.h>
 #define dirPin 2  //StepperMotor Direction pin
 #define stepPin 3 //StepperMotor Stepping pin
 #define motorInterfaceType 1  //StepperMotor Interface Type (1 is for driver)
 
-int motorSetPosition = 0.0;
-
-AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
-
-//-----------------------------------------------------------Temperature---------------------------------------------------------////
+// Temperature
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
-OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 
+// Frequency
+#include <FreqCount.h>
+
+// Mass
+#include <HX711_ADC.h>
+
+
+
+// --- Variables --- //
+// Motor
+int motorSetPosition = 0.0;
+AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
+
+//-----------------------------------------------------------Temperature---------------------------------------------------------////
+
+OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 DallasTemperature tempSensors(&oneWire);
 // Declare the addresses of the DS18B20's
 DeviceAddress tempHE = {0x28, 0x25, 0x34, 0x94, 0x97, 0x0E, 0x03, 0x5B};
@@ -50,14 +63,13 @@ float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 1000;    int PID_min = 0;      float PID_Percent = 0.0;
 
 //-----------------------------------------------------------Frequency---------------------------------------------------------////
-#include <FreqCount.h>
+
 unsigned long frequency;
 
 //-----------------------------------------------------------Load Cell-----------------------------------------------------------////
-#include <HX711_ADC.h>
+
 HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
 long t;
-
 //Load Cell
 float mass = 0.0;
 float averageMass = 0.0;
@@ -101,36 +113,22 @@ void setup() {
   motor.setMaxSpeed(500);
   motor.setCurrentPosition(0);
 
-  Time = millis();
+  Time = millis() / 1000;
 
   LoadCell.setCalFactor(416.0); // user set calibration factor for HX711 load cell
   LoadCell.start(stabilisingtime);
-  // Check if last tare operation is complete
-  if (LoadCell.getTareStatus() == true) {
-    Serial.println("Tare complete");
-  }
 
-  //-----------------------------------------------------------Startup Procedure---------------------------------------------------------------///
-
-  startupSequence();
+  startupSequence(); // set cooling water level to near zero before loop starts
 
 }
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
 void loop() {
-  //-----------------------------------------------------------Time---------------------------------------------------------------///
-  // Calculate and print the time
-  time = (millis()) / 1000;
 
+  time = (millis()) / 1000;
   //-----------------------------------------------------------Temperature & PID CONTROL------------------------------------------////
-  // Read the value of temperature probes
-  tempSensors.requestTemperatures();
-  // Store the actual temperature now
-  tempHeatExchanger = tempSensors.getTempC(tempHE);
-  tempTower =  tempSensors.getTempC(tempT);
-  tempWash = tempSensors.getTempC(tempW);
-  tempOutlet = tempSensors.getTempC(tempO);
+
 
   calculatePID();
 
@@ -289,8 +287,8 @@ void calculatePID() {
 
   //For derivative we need real time to calculate speed change rate
   timePrev = Time;                            // the previous time is stored before the actual time read
-  Time = millis();                            // actual time read
-  elapsedTime = (Time - timePrev) / 1000;
+  Time = millis() / 1000;                            // actual time read
+  elapsedTime = (Time - timePrev);
   //Now we can calculate the D value
   PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
 
