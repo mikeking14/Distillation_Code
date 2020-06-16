@@ -75,7 +75,6 @@ const int room_temperature_constant = 22;
 float epsilon = 0.0;
 float constant_F = 4500000.0;
 float constant_T = 0.3;
-int tempAnomolyCounter = 0;
 unsigned long time = 0;
 float print_time = 0;
 int state = 0;
@@ -107,7 +106,6 @@ void setup() {
   LoadCell.setCalFactor(416.0); // user set calibration factor for HX711 load cell
   LoadCell.start(stabilisingtime);
   // Check if last tare operation is complete
-  delay(stabilisingtime + 1);
   if (LoadCell.getTareStatus() == true) {
     Serial.println("Tare complete");
   }
@@ -170,11 +168,6 @@ void loop() {
   time = (millis()) / 1000;
 
   //-----------------------------------------------------------Temperature & PID CONTROL------------------------------------------////
-  // Store the previous temperatures incase of an anomoly in the new reading
-  prevTempHeatExchanger = tempHeatExchanger;
-  prevTempTower =  tempTower;
-  prevTempWash =  tempWash;
-  prevTempOutlet = tempOutlet;
   // Read the value of temperature probes
   tempSensors.requestTemperatures();
   // Store the actual temperature now
@@ -182,16 +175,6 @@ void loop() {
   tempTower =  tempSensors.getTempC(tempT);
   tempWash = tempSensors.getTempC(tempW);
   tempOutlet = tempSensors.getTempC(tempO);
-        //Temperarure Anomoly Counter
-        if (tempHeatExchanger < 10 || tempHeatExchanger > 130 || tempTower < 10 || tempTower > 130 ||
-            tempWash < 10 || tempWash > 130 || tempOutlet< 10 || tempOutlet > 130)
-           {
-             tempAnomolyCounter = tempAnomolyCounter + 1;
-             tempHeatExchanger = prevTempHeatExchanger;
-             tempTower = prevTempTower;
-             tempWash = prevTempWash;
-             tempOutlet = prevTempOutlet;
-           }
 
   //Next we calculate the error between the setpoint and the real value
   PID_error = set_temperature - tempTower;
@@ -315,31 +298,9 @@ void loop() {
 
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
 
-  if(time > print_time + .5){
 
-      print_time = time;
-      PID_Percent = (255 - PID_value)/(255);
-      //Serial.print(time);         Serial.print("\t");
-      Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
-      Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
-      Serial.print("PID ER:");    Serial.print("\t");     Serial.print(PID_error);                  Serial.print("\t");
-      Serial.print("PID");        Serial.print("\t");     Serial.print(PID_value);                  Serial.print("\t");
-      Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
-      Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
-      Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.print("\t");
-      //Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
-      Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
-      Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
-      Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
-      Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
-      Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
-      Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
-      Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t"); //20ms sample in H
-      Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
-      Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);                 Serial.print("\t");
-      Serial.print("Anomoly:");   Serial.print("\t");     Serial.println(tempAnomolyCounter);
-
-      }
+      printData();
+      
 
 }
 
@@ -367,7 +328,6 @@ float calculateAverage(float input) {
   // send it to the computer as ASCII digits
   return average;
 }
-
 //Store the temperature and time in a matrix
 float storeError(float input, float timeMillis) {
   // read from the sensor:
@@ -380,3 +340,25 @@ float storeError(float input, float timeMillis) {
   PID_temperature_error[2] = input;
   derivativeTime[2] = timeMillis;
   }
+
+void printData() {
+
+  Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
+  Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
+  Serial.print("PID ER:");    Serial.print("\t");     Serial.print(PID_error);                  Serial.print("\t");
+  Serial.print("PID");        Serial.print("\t");     Serial.print(PID_value);                  Serial.print("\t");
+  Serial.print("P:");         Serial.print("\t");     Serial.print(PID_p);                      Serial.print("\t");
+  Serial.print("I:");         Serial.print("\t");     Serial.print(PID_i);                      Serial.print("\t");
+  Serial.print("D:");         Serial.print("\t");     Serial.print(PID_d);                      Serial.print("\t");
+  //Serial.print("HE°:");       Serial.print("\t");     Serial.print(tempHeatExchanger);          Serial.print("\t");
+  Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
+  Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
+  Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
+  Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
+  Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
+  Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
+  Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t");
+  Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
+  Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);                 Serial.println("\t");
+
+}
