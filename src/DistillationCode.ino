@@ -1,22 +1,14 @@
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Libraries and Variables -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 // ---------- Libraries and Instances ---------- //
-
-// Motor
 #include <AccelStepper.h>
 #define dirPin 2  //StepperMotor Direction pin
 #define stepPin 3 //StepperMotor Stepping pin
 #define motorInterfaceType 1  //StepperMotor Interface Type (1 is for driver)
-
-// Temperature
-#include <OneWire.h>
-#include <DallasTemperature.h>
+#include <OneWire.h>  // Temperature
+#include <DallasTemperature.h>  // Temperarure
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
-
-// Frequency
-#include <FreqCount.h>
-
-// Mass
-#include <HX711_ADC.h>
+#include <FreqCount.h>  // Frequency
+#include <HX711_ADC.h> // Load Cell
 
 
 // ---------- Variables ---------- //
@@ -58,15 +50,12 @@ float kp = 15;   float ki = 1;   float kd = 10;
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 1000;    int PID_min = 0;      float PID_Percent = 0.0;
 
-//----------------------------------------------------------- Frequency ---------------------------------------------------------////
-
+// Frequency
 unsigned long frequency;
 
-//----------------------------------------------------------- Load Cell -----------------------------------------------------------////
-
+// Load Cell
 HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
 long t;
-//Load Cell
 float mass = 0.0;
 float average_mass = 0.0;
 float derivative_mass = 0.0;
@@ -77,8 +66,7 @@ int checkpoint = checkpoint_const;
 int checkpoint_increment = 100;
 long stabilising_time = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
 
-//----------------------------------------------------------- Other ----------------------------------------------------------------////
-//Epsilon Constants
+// Other
 const int room_temperature_constant = 22;
 float epsilon = 0.0;
 float constant_F = 4500000.0;
@@ -89,7 +77,6 @@ int state = 0;
 int startup = 1;
 byte byte_read;
 
-//----------------------------------------------------------- Function Variables ----------------------------------------------------------------////
 //Averaging Function Variables
 const int num_readings = 10;
 float readings[num_readings]; // the readings from the analog input
@@ -99,6 +86,7 @@ float average = 0; // the average
 
 
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Setup -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+
 void setup() {
 
   Serial.begin(115200);
@@ -137,7 +125,9 @@ void loop() {
   temperatureIncrementer();
 
   //----------------------------------------------------------- Print Statement -------------------------------------------------------////
-  printData();
+  if(time > print_time + .5){
+    printData();
+  }
 
 }
 
@@ -191,6 +181,8 @@ void startupSequence() {
 }
 
 void printData() {
+
+  print_time = millis()/1000;
 
   Serial.print("SetP:");      Serial.print("\t");     Serial.print(motorSetPosition);           Serial.print("\t");
   Serial.print("CurP:");      Serial.print("\t");     Serial.print(motor.currentPosition());    Serial.print("\t");
@@ -296,7 +288,6 @@ void setValvePosition() {
   }
 }
 
-
 void temperatureIncrementer() {
   time = millis()/1000;
   // Checks for increments
@@ -359,7 +350,7 @@ float calculateAverage(float input) {
   return average;
 }
 
-float storeError(float input, float timeMillis) {
+void storeError(float input, float timeMillis) {
   // read from the sensor:
   PID_temperature_error[0] = PID_temperature_error[1];
   derivativeTime[0] = derivativeTime[1];
