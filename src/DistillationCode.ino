@@ -39,8 +39,8 @@ int setTempCounterMax = 50;
 float PID_error = 0.0;
 float previous_error = 0.0;
 float elapsedTime, Time, timePrev, timeLeft;
-float elapsedTime2, timePrev2;
-float elapsedTime3, timePrev3;
+float elapsedTime2; float timePrev2 = 0.0;
+float elapsedTime3; float timePrev3 = 0.0;
 int PID_value = 0;
 
 //PID Constants
@@ -162,52 +162,16 @@ void loop() {
 
   //-----------------------------------------------------------Load Cell-------------------------------------------------------////
 
-  getMass();
+  averageMass = getMass();
 
   //-----------------------------------------------------------Set Temperarure Incrementer-------------------------------------------------------////
 
-  time = millis()/1000;
-  // Checks for increments
-      //Increment the tower temperature if the mass flow rate falls below a certain level
-      if(setTempCounter == 0 & checkpoint == checkpointConst){
-        checkpoint = time + checkpointIncrement;
-        minMassRate = 0.25;
-        //checkpoint = time;
-      }
-      // Checks every second to see if the mass rate is too slow (minMassRate). If massRate < minMassRate then it increments a counter.
-      // If the counter is above 30 at our checkpoint then increment the setTemp.
-      elapsedTime3 = (time - timePrev3);
-      if(elapsedTime3 >= 1) {
-        timePrev3 = time;
-        if(massRate < minMassRate){
-          //Only increment if distillation has started
-          setTempCounter += 1;
-          //Keep the counter at the max level
-          if(setTempCounter > setTempCounterMax) {
-            setTempCounter = setTempCounterMax;
-          }
-        }
-        else{
-          if(setTempCounter > 0){
-            setTempCounter -= 1;
-          }
-          else{
-            setTempCounter = 0;
-          }
-        }
-      }
-
-      //Check to see if the setTempCounter has reached its max and that we have waited enough time to reach our checkpoint.
-      if(setTempCounter == setTempCounterMax  & time > checkpoint){
-        set_temperature += 1;
-        setTempCounter = 0;
-        checkpoint = time + checkpointIncrement; //Increment for checkpoint
-      }
+  temperatureIncrementer();
 
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
 
 
-      printData();
+  printData();
 
 
 }
@@ -250,16 +214,11 @@ void startupSequence() {
           motor.setSpeed(-200);
           motor.runSpeed();
           }
-
       }
       //Set the motor current position to zero and leave setup
       if(byteRead == 9){
-        Serial.println("MotorPosition:");
-        Serial.println(motor.currentPosition());
         motor.setCurrentPosition(0);
-        Serial.println("Startup = 0");
         startup = 0;
-        Serial.println("Break");
         break;
       }
     }
@@ -288,12 +247,12 @@ void printData() {
 
 }
 
-void getMass() {
+float getMass() {
   // Update() should be called at least as often as HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS
   // Longer delay in sketch will reduce effective sample rate (be carefull with delay() in loop)
   LoadCell.update();
   // Get smoothed value from data set + current calibration factor
-  float mass = LoadCell.getData() * -1;
+  mass = LoadCell.getData() * -1;
   t = millis();
   // Calculate the mass flow rate
   averageMass = calculateAverage(mass);
@@ -309,6 +268,7 @@ void getMass() {
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay();
   }
+  return averageMass;
 }
 
 void calculatePID() {
@@ -344,6 +304,45 @@ void calculatePID() {
     PID_value = PID_max;}
 }
 
+void temperatureIncrementer() {
+  time = millis()/1000;
+  // Checks for increments
+      //Increment the tower temperature if the mass flow rate falls below a certain level
+      if(setTempCounter == 0 & checkpoint == checkpointConst){
+        checkpoint = time + checkpointIncrement;
+        minMassRate = 0.25;
+        //checkpoint = time;
+      }
+      // Checks every second to see if the mass rate is too slow (minMassRate). If massRate < minMassRate then it increments a counter.
+      // If the counter is above 30 at our checkpoint then increment the setTemp.
+      elapsedTime3 = (time - timePrev3);
+      if(elapsedTime3 >= 1) {
+        timePrev3 = time;
+        if(massRate < minMassRate){
+          //Only increment if distillation has started
+          setTempCounter += 1;
+          //Keep the counter at the max level
+          if(setTempCounter > setTempCounterMax) {
+            setTempCounter = setTempCounterMax;
+          }
+        }
+        else{
+          if(setTempCounter > 0){
+            setTempCounter -= 1;
+          }
+          else{
+            setTempCounter = 0;
+          }
+        }
+      }
+
+      //Check to see if the setTempCounter has reached its max and that we have waited enough time to reach our checkpoint.
+      if(setTempCounter == setTempCounterMax  & time > checkpoint){
+        set_temperature += 1;
+        setTempCounter = 0;
+        checkpoint = time + checkpointIncrement; //Increment for checkpoint
+      }
+}
 
 float calculateAverage(float input) {
   // subtract the last reading:
