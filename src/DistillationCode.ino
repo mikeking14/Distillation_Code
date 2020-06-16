@@ -15,7 +15,6 @@ AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // Accel
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
 OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 
-// Pass our oneWire reference to Dallas Temperature.
 DallasTemperature tempSensors(&oneWire);
 // Declare the addresses of the DS18B20's
 DeviceAddress tempHE = {0x28, 0x25, 0x34, 0x94, 0x97, 0x0E, 0x03, 0x5B};
@@ -105,9 +104,10 @@ void setup() {
 
   Time = millis();
 
+  LoadCell.setCalFactor(416.0); // user set calibration factor for HX711 load cell
   LoadCell.start(stabilisingtime);
-  LoadCell.setCalFactor(416.0); // user set calibration factor (float)
   // Check if last tare operation is complete
+  delay(stabilisingtime + 1);
   if (LoadCell.getTareStatus() == true) {
     Serial.println("Tare complete");
   }
