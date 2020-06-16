@@ -1,4 +1,4 @@
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Libraries and Variables-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Libraries and Variables -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 // ---------- Libraries and Instances ---------- //
 
 // Motor
@@ -58,11 +58,11 @@ float kp = 15;   float ki = 1;   float kd = 10;
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 1000;    int PID_min = 0;      float PID_Percent = 0.0;
 
-//-----------------------------------------------------------Frequency---------------------------------------------------------////
+//----------------------------------------------------------- Frequency ---------------------------------------------------------////
 
 unsigned long frequency;
 
-//-----------------------------------------------------------Load Cell-----------------------------------------------------------////
+//----------------------------------------------------------- Load Cell -----------------------------------------------------------////
 
 HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
 long t;
@@ -77,7 +77,7 @@ int checkpoint = checkpoint_const;
 int checkpoint_increment = 100;
 long stabilising_time = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
 
-//-----------------------------------------------------------Other----------------------------------------------------------------////
+//----------------------------------------------------------- Other ----------------------------------------------------------------////
 //Epsilon Constants
 const int room_temperature_constant = 22;
 float epsilon = 0.0;
@@ -89,7 +89,7 @@ int state = 0;
 int startup = 1;
 byte byte_read;
 
-//-----------------------------------------------------------Function Variables----------------------------------------------------------------////
+//----------------------------------------------------------- Function Variables ----------------------------------------------------------------////
 //Averaging Function Variables
 const int num_readings = 10;
 float readings[num_readings]; // the readings from the analog input
@@ -98,7 +98,7 @@ float total = 0; // the running total
 float average = 0; // the average
 
 
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Setup-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Setup -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 void setup() {
 
   Serial.begin(115200);
@@ -118,57 +118,31 @@ void setup() {
 
 }
 
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Loop-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Loop -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
 void loop() {
 
   time = (millis()) / 1000;
-  //-----------------------------------------------------------Temperature & PID CONTROL------------------------------------------////
-
-
+  //----------------------------------------------------------- Temperature & PID CONTROL ------------------------------------------////
   calculatePID();
+  setValvePosition();
 
-  //Now we can set the valve position
-  if(tempTower + 30 < set_temperature){
-    motorSetPosition = 50;
-  }
-  else{
-    // Calculate the valve position.
-    motorSetPosition = (255-PID_value);
-  }
+  //----------------------------------------------------------- Frequency -------------------------------------------------------////
+  getFrequency();
 
-  while(motor.currentPosition() > motorSetPosition && motor.currentPosition() > 0) {
-    motor.setSpeed(-200); // Less water
-    motor.runSpeed();
-  }
-  while(motor.currentPosition() < motorSetPosition && motor.currentPosition() < 800) {
-    motor.setSpeed(200); // More Water
-    motor.runSpeed();
-  }
+  //----------------------------------------------------------- Load Cell -------------------------------------------------------////
+  getMass();
 
-  //-----------------------------------------------------------Frequency-------------------------------------------------------////
-
-  if (FreqCount.available()) {
-    frequency = FreqCount.read();
-  }
-
-  //-----------------------------------------------------------Load Cell-------------------------------------------------------////
-
-  average_mass = getMass();
-
-  //-----------------------------------------------------------Set Temperarure Incrementer-------------------------------------------------------////
-
+  //----------------------------------------------------------- Set Temperarure Incrementer -------------------------------------------------------////
   temperatureIncrementer();
 
-  //-----------------------------------------------------------Print Statement-------------------------------------------------------////
-
+  //----------------------------------------------------------- Print Statement -------------------------------------------------------////
   printData();
-
 
 }
 
 
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Functions-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Functions -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
 void startupSequence() {
 
@@ -238,6 +212,12 @@ void printData() {
 
 }
 
+void getFrequency() {
+  if (FreqCount.available()) {
+    frequency = FreqCount.read();
+  }
+}
+
 float getMass() {
   // Update() should be called at least as often as HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS
   // Longer delay in sketch will reduce effective sample rate (be carefull with delay() in loop)
@@ -295,6 +275,27 @@ void calculatePID() {
     PID_value = PID_max;}
 
 }
+
+void setValvePosition() {
+  //Now we can set the valve position
+  if(tempTower + 30 < set_temperature){
+    motorSetPosition = 50;
+  }
+  else{
+    // Calculate the valve position.
+    motorSetPosition = (255-PID_value);
+  }
+
+  while(motor.currentPosition() > motorSetPosition && motor.currentPosition() > 0) {
+    motor.setSpeed(-200); // Less water
+    motor.runSpeed();
+  }
+  while(motor.currentPosition() < motorSetPosition && motor.currentPosition() < 800) {
+    motor.setSpeed(200); // More Water
+    motor.runSpeed();
+  }
+}
+
 
 void temperatureIncrementer() {
   time = millis()/1000;
