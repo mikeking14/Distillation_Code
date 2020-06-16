@@ -1,6 +1,6 @@
 clear; close all; clc;
 %% Initialize Workspace
-        runNumber = 39;
+        runNumber = 40;
 
 %% Import Arduino Data
         
@@ -47,7 +47,7 @@ clear; close all; clc;
     outlet_Temp_Smooth = smoothdata(outlet_Temp_Med_Smooth, 'movmean', 10);
     
     
-%% Plotting
+%% Plotting - ALL DATA
     
     %Frequency/Mass/Resistivity vs Time
         close all
@@ -59,14 +59,14 @@ clear; close all; clc;
         % Left side of graph
             yyaxis left
             ylabel 'Frequency'
-            ylim([120000 140000])
+            ylim([128000 134000])
             plot(freq_Smooth, '-b')
             %plot(resistivity_Smooth/5, 'g')
         % Right side of graph
             yyaxis right
             ylabel 'Mass / Temperature'
             ylim([0 125])
-            plot(arduino.Mass/15, '-m')
+            plot(arduino.Mass/20, '-m')
             plot(arduino.SetTemp, '--r')
             plot(arduino.Tower_Temp, '-r')
             plot(wash_Temp_Smooth, '-c')
@@ -74,12 +74,12 @@ clear; close all; clc;
             plot(mass_Rate_Smooth*100, '-y')
          
         % Legend 
-            legend({'Frequency','Mass/15', 'Set Temperature', 'Tower Temperature','Wash Temp','Outlet Temp', 'Mass Rate * 100' },'Location','Northwest')
+            legend({'Frequency','Mass/20', 'Set Temperature', 'Tower Temperature','Wash Temp','Outlet Temp', 'Mass Rate * 100' },'Location','Northwest')
             hold off
 
             
-     %% Plotting 2
-        close all
+%% Plotting - PID Control
+        
         figure
         hold on
         title 'PID CONTROL'
