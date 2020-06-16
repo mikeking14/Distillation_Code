@@ -1,5 +1,5 @@
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Libraries and Variables-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
-// --- Libraries and instances --- //
+// ---------- Libraries and Instances ---------- //
 
 // Motor
 #include <AccelStepper.h>
@@ -19,14 +19,12 @@
 #include <HX711_ADC.h>
 
 
-
-// --- Variables --- //
+// ---------- Variables ---------- //
 // Motor
 int motorSetPosition = 0.0;
 AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
 
-//-----------------------------------------------------------Temperature---------------------------------------------------------////
-
+// Temperature
 OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 DallasTemperature tempSensors(&oneWire);
 // Declare the addresses of the DS18B20's
@@ -40,20 +38,18 @@ float tempHeatExchanger = 0.0; float tempTower = 0.0; float tempWash = 0.0; floa
 float prevTempHeatExchanger = 0.0; float prevTempTower = 0.0; float prevTempWash = 0.0; float prevTempOutlet = 0.0;
 
 // Store temperature
-const int numTempReadings = 3;
-float PID_temperature_error[numTempReadings];
+const int num_temp_readings = 3;
+float PID_temperature_error[num_temp_readings];
 // Derivative
-float derivativeTime[numTempReadings];
-float tempDerivative = 0.0;
+float derivativeTime[num_temp_readings];
 
 float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
-int setTempCounter = 20;
-int setTempCounterMax = 50;
+int set_temp_counter = 20;
+int set_temp_counter_Max = 50;
 float PID_error = 0.0;
-float previous_error = 0.0;
-float elapsedTime, Time, timePrev, timeLeft;
-float elapsedTime2; float timePrev2 = 0.0;
-float elapsedTime3; float timePrev3 = 0.0;
+float elapsed_time, Time, time_prev;
+float elapsed_time2; float time_prev2 = 0.0;
+float elapsed_time3; float time_prev3 = 0.0;
 int PID_value = 0;
 
 //PID Constants
@@ -72,14 +68,14 @@ HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
 long t;
 //Load Cell
 float mass = 0.0;
-float averageMass = 0.0;
-float massRate = 0.0;
-float prevMass = 0.0;
-float minMassRate = 0.1;
-int checkpointConst = 10000;
-int checkpoint = checkpointConst;
-int checkpointIncrement = 100;
-long stabilisingtime = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
+float average_mass = 0.0;
+float derivative_mass = 0.0;
+float prev_mass = 0.0;
+float min_mass_rate = 0.1;
+int checkpoint_const = 10000;
+int checkpoint = checkpoint_const;
+int checkpoint_increment = 100;
+long stabilising_time = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
 
 //-----------------------------------------------------------Other----------------------------------------------------------------////
 //Epsilon Constants
@@ -91,13 +87,13 @@ unsigned long time = 0;
 float print_time = 0;
 int state = 0;
 int startup = 1;
-byte byteRead;
+byte byte_read;
 
 //-----------------------------------------------------------Function Variables----------------------------------------------------------------////
 //Averaging Function Variables
-const int numReadings = 10;
-float readings[numReadings]; // the readings from the analog input
-int readIndex = 0; // the index of the current reading
+const int num_readings = 10;
+float readings[num_readings]; // the readings from the analog input
+int read_index = 0; // the index of the current reading
 float total = 0; // the running total
 float average = 0; // the average
 
@@ -116,7 +112,7 @@ void setup() {
   Time = millis() / 1000;
 
   LoadCell.setCalFactor(416.0); // user set calibration factor for HX711 load cell
-  LoadCell.start(stabilisingtime);
+  LoadCell.start(stabilising_time);
 
   startupSequence(); // set cooling water level to near zero before loop starts
 
@@ -149,8 +145,6 @@ void loop() {
     motor.setSpeed(200); // More Water
     motor.runSpeed();
   }
-  //Remember to store the previous error for next loop.
-  previous_error = PID_error;
 
   //-----------------------------------------------------------Frequency-------------------------------------------------------////
 
@@ -160,14 +154,13 @@ void loop() {
 
   //-----------------------------------------------------------Load Cell-------------------------------------------------------////
 
-  averageMass = getMass();
+  average_mass = getMass();
 
   //-----------------------------------------------------------Set Temperarure Incrementer-------------------------------------------------------////
 
   temperatureIncrementer();
 
   //-----------------------------------------------------------Print Statement-------------------------------------------------------////
-
 
   printData();
 
@@ -190,9 +183,9 @@ void startupSequence() {
   while(startup == 1){
     if (Serial.available()) {
       // Read the most recent byte from the serial monitor
-      byteRead = Serial.read()- '0';
+      byte_read = Serial.read()- '0';
       // Open the valve by pressing 2
-      if (byteRead == 1) {
+      if (byte_read == 1) {
         Serial.print(" More Water ");
         // Set the current position to 0:
           motor.setCurrentPosition(0);
@@ -203,7 +196,7 @@ void startupSequence() {
           }
       }
       // Close the valve more by pressing 2
-      if (byteRead == 2){
+      if (byte_read == 2){
         Serial.print(" Less Water ");
         // Set the current position to 0:
         motor.setCurrentPosition(0);
@@ -214,7 +207,7 @@ void startupSequence() {
           }
       }
       //Set the motor current position to zero and leave setup
-      if(byteRead == 9){
+      if(byte_read == 9){
         motor.setCurrentPosition(0);
         startup = 0;
         break;
@@ -236,11 +229,11 @@ void printData() {
   Serial.print("W°:");        Serial.print("\t");     Serial.print(tempWash);                   Serial.print("\t");
   Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
   Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
-  Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(massRate);                   Serial.print("\t");
+  Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(derivative_mass);            Serial.print("\t");
   Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
   Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
   Serial.print("ST:");        Serial.print(",");      Serial.print(set_temperature);            Serial.print("\t");
-  Serial.print("STCnt:");     Serial.print(",");      Serial.print(setTempCounter);             Serial.print("\t");
+  Serial.print("STCnt:");     Serial.print(",");      Serial.print(set_temp_counter);           Serial.print("\t");
   Serial.print("ChkP:");      Serial.print(",");      Serial.print(checkpoint);                 Serial.println("\t");
 
 }
@@ -253,12 +246,12 @@ float getMass() {
   mass = LoadCell.getData() * -1;
   t = millis();
   // Calculate the mass flow rate
-  averageMass = calculateAverage(mass);
-  elapsedTime2 = (t - timePrev2) / 1000;
-  if (elapsedTime2 > 1) {
-    massRate = (averageMass - prevMass) / elapsedTime2;
-    timePrev2 = t;
-    prevMass = averageMass;
+  average_mass = calculateAverage(mass);
+  elapsed_time2 = (t - time_prev2) / 1000;
+  if (elapsed_time2 > 1) {
+    derivative_mass = (average_mass - prev_mass) / elapsed_time2;
+    time_prev2 = t;
+    prev_mass = average_mass;
   }
   // Receive from serial terminal
   if (Serial.available() > 0) {
@@ -266,7 +259,7 @@ float getMass() {
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay();
   }
-  return averageMass;
+  return average_mass;
 }
 
 void calculatePID() {
@@ -286,9 +279,9 @@ void calculatePID() {
     }
 
   //For derivative we need real time to calculate speed change rate
-  timePrev = Time;                            // the previous time is stored before the actual time read
+  time_prev = Time;                            // the previous time is stored before the actual time read
   Time = millis() / 1000;                            // actual time read
-  elapsedTime = (Time - timePrev);
+  elapsed_time = (Time - time_prev);
   //Now we can calculate the D value
   PID_d = kd * ( 3*PID_temperature_error[2] - 4*PID_temperature_error[1] + PID_temperature_error[0] ) / ((derivativeTime[2] - derivativeTime[0])/1000);;
 
@@ -300,70 +293,71 @@ void calculatePID() {
     PID_value = PID_min ;}
   if (PID_value > PID_max){
     PID_value = PID_max;}
+
 }
 
 void temperatureIncrementer() {
   time = millis()/1000;
   // Checks for increments
       //Increment the tower temperature if the mass flow rate falls below a certain level
-      if(setTempCounter == 0 & checkpoint == checkpointConst){
-        checkpoint = time + checkpointIncrement;
-        minMassRate = 0.25;
+      if(set_temp_counter == 0 & checkpoint == checkpoint_const){
+        checkpoint = time + checkpoint_increment;
+        min_mass_rate = 0.25;
         //checkpoint = time;
       }
-      // Checks every second to see if the mass rate is too slow (minMassRate). If massRate < minMassRate then it increments a counter.
+      // Checks every second to see if the mass rate is too slow (min_mass_rate). If derivative_mass < min_mass_rate then it increments a counter.
       // If the counter is above 30 at our checkpoint then increment the setTemp.
-      elapsedTime3 = (time - timePrev3);
-      if(elapsedTime3 >= 1) {
-        timePrev3 = time;
-        if(massRate < minMassRate){
+      elapsed_time3 = (time - time_prev3);
+      if(elapsed_time3 >= 1) {
+        time_prev3 = time;
+        if(derivative_mass < min_mass_rate){
           //Only increment if distillation has started
-          setTempCounter += 1;
+          set_temp_counter += 1;
           //Keep the counter at the max level
-          if(setTempCounter > setTempCounterMax) {
-            setTempCounter = setTempCounterMax;
+          if(set_temp_counter > set_temp_counter_Max) {
+            set_temp_counter = set_temp_counter_Max;
           }
         }
         else{
-          if(setTempCounter > 0){
-            setTempCounter -= 1;
+          if(set_temp_counter > 0){
+            set_temp_counter -= 1;
           }
           else{
-            setTempCounter = 0;
+            set_temp_counter = 0;
           }
         }
       }
 
-      //Check to see if the setTempCounter has reached its max and that we have waited enough time to reach our checkpoint.
-      if(setTempCounter == setTempCounterMax  & time > checkpoint){
+      //Check to see if the set_temp_counter has reached its max and that we have waited enough time to reach our checkpoint.
+      if(set_temp_counter == set_temp_counter_Max  & time > checkpoint){
         set_temperature += 1;
-        setTempCounter = 0;
-        checkpoint = time + checkpointIncrement; //Increment for checkpoint
+        set_temp_counter = 0;
+        checkpoint = time + checkpoint_increment; //Increment for checkpoint
       }
 }
 
 float calculateAverage(float input) {
   // subtract the last reading:
-  total = total - readings[readIndex];
+  total = total - readings[read_index];
   // read from the sensor:
-  readings[readIndex] = input;
+  readings[read_index] = input;
   // add the reading to the total:
-  total = total + readings[readIndex];
+  total = total + readings[read_index];
   // advance to the next position in the array:
-  readIndex = readIndex + 1;
+  read_index = read_index + 1;
 
   // if we're at the end of the array...
-  if (readIndex >= numReadings) {
+  if (read_index >= num_readings) {
     // ...wrap around to the beginning:
-    readIndex = 0;
+    read_index = 0;
   }
 
   // calculate the average:
-  average = total / numReadings;
+  average = total / num_readings;
   // send it to the computer as ASCII digits
   return average;
 }
-//Store the temperature and time in a matrix
+
 float storeError(float input, float timeMillis) {
   // read from the sensor:
   PID_temperature_error[0] = PID_temperature_error[1];
