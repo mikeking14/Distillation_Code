@@ -102,25 +102,25 @@ clear; close all; clc;
             legend({'Frequency','Resistivity/ 1.5','Mass/50', 'Set Temp','Tower Temperature', 'Wash Temperature','Outlet Temp','Mass Rate * 100' },'Location','Northwest')
             hold off
 
-%% Plotting - Frequency Vs Mass
-
-        figure
-        hold on
-        title 'Frequency vs Mass'
-        xlabel 'Mass'
-
-        % Left side of graph
-            yyaxis left
-            ylabel 'Frequency'
-            ylim([108000 144000])
-            plot(mass_Smooth, freq_Smooth, '-b')
-        
-        % Right side of graph
-            yyaxis right
-            ylabel 'Mass / Tower Temp'
-            ylim([50 120])
-            plot(mass_Smooth, tower_Temp_Smooth, '-r')
-            
-        % Legend
-            legend({'Frequency', 'Tower Temp'},'Location','Northeast')
-            hold off
+% %% Plotting - Frequency Vs Mass
+% 
+%         figure
+%         hold on
+%         title 'Frequency vs Mass'
+%         xlabel 'Mass'
+% 
+%         % Left side of graph
+%             yyaxis left
+%             ylabel 'Frequency'
+%             ylim([108000 144000])
+%             plot(mass_Smooth, freq_Smooth, '-b')
+%         
+%         % Right side of graph
+%             yyaxis right
+%             ylabel 'Mass / Tower Temp'
+%             ylim([50 120])
+%             plot(mass_Smooth, tower_Temp_Smooth, '-r')
+%             
+%         % Legend
+%             legend({'Frequency', 'Tower Temp'},'Location','Northeast')
+%             hold off
