@@ -2,7 +2,6 @@
 
 #include <variables.h>
 
-
 //-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Setup -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
 
 void setup() {
@@ -20,7 +19,7 @@ void setup() {
   LoadCell.setCalFactor(416.0); // user set calibration factor for HX711 load cell
   LoadCell.start(stabilising_time);
 
-  startupSequence(); // set cooling water level to near zero before loop starts
+  startupSequence(); // used to "zero" the cooling water valve
 
 }
 
@@ -41,7 +40,6 @@ void loop() {
 
   //----------------------------------------------------------- Temperarure -------------------------------------------------------////
   getTemp();
-
   temperatureIncrementer();
 
   //----------------------------------------------------------- Print Statement -------------------------------------------------------////
@@ -49,6 +47,24 @@ void loop() {
     printData();
   }
 
+
+  // State Awareness criteria
+    // Initialize
+    if(tempTower < warmupTemp) {
+      float kp = 1;   float ki = 1;   float kd = 1;
+    }
+    // Initialize - Warmup
+    else if(warmupTemp < tempTower && tempTower <= (set_temperature - 10.0)) {
+      float kp = 15;   float ki = 1;   float kd = 10;
+    }
+    // Warmup - Distilation
+    else if (tempTower >= (set_temperature - 10.0)) {
+      float kp = 5;   float ki = 2;   float kd = 10;
+    }
+    // Something istn
+    else {
+      Serial.println("Something broke");
+    }
 }
 
 
@@ -147,7 +163,6 @@ float getMass() {
   }
   // Receive from serial terminal
   if (Serial.available() > 0) {
-    float mass;
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay();
   }
@@ -161,7 +176,7 @@ void calculatePID() {
   //Calculate the P value
   PID_p = kp * PID_error;
   //Calculate the I value in a range on +-10
-  if (-5 < PID_error < 5){
+  if (-5 < PID_error && PID_error < 5){
       PID_i = PID_i + (ki * PID_error);
       if (PID_i > 300
       ){
@@ -212,7 +227,7 @@ void temperatureIncrementer() {
   time = millis()/1000;
   // Checks for increments
       //Increment the tower temperature if the mass flow rate falls below a certain level
-      if(set_temp_counter == 0 & checkpoint == checkpoint_const){
+      if(set_temp_counter == 0 && checkpoint == checkpoint_const){
         checkpoint = time + checkpoint_increment;
         min_mass_derivative = 0.25;
         //checkpoint = time;
@@ -241,7 +256,7 @@ void temperatureIncrementer() {
       }
 
       //Check to see if the set_temp_counter has reached its max and that we have waited enough time to reach our checkpoint.
-      if(set_temp_counter == set_temp_counter_Max  & time > checkpoint){
+      if(set_temp_counter == set_temp_counter_Max  && uint64_t(time) > checkpoint){
         set_temperature += 1;
         set_temp_counter = 0;
         checkpoint = time + checkpoint_increment; //Increment for checkpoint

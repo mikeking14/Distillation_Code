@@ -8,7 +8,8 @@
 #include <FreqCount.h>  // Frequency
 #include <HX711_ADC.h> // Load Cell
 
-
+int state = 0;
+int previousState = 1;
 
 // Motor
 int motorSetPosition = 0.0;
@@ -23,12 +24,13 @@ DeviceAddress tempW = {0x28, 0xFF, 0x87, 0x19, 0xA5, 0x16, 0x03, 0x1E};
 DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 
 // PID temperature control
-float tempHeatExchanger = 0.0; float tempTower = 0.0; float tempWash = 0.0; float tempOutlet = 0.0;
-float prevTempHeatExchanger = 0.0; float prevTempTower = 0.0; float prevTempWash = 0.0; float prevTempOutlet = 0.0;
+float tempHeatExchanger; float tempTower; float tempWash; float tempOutlet;
+float prevTempHeatExchanger; float prevTempTower; float prevTempWash; float prevTempOutlet;
 
 // Store temperature
 const int num_temp_readings = 3;
 float PID_temperature_error[num_temp_readings];
+int warmupTemp = 25;
 // Derivative
 float derivativeTime[num_temp_readings];
 
@@ -42,7 +44,7 @@ float elapsed_time3; float time_prev3 = 0.0;
 int PID_value = 0;
 
 //PID Constants
-float kp = 15;   float ki = 1;   float kd = 10;
+float kp;   float ki;   float kd;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 0.0;    float PID_d = 0.0;
 int PID_max = 1000;    int PID_min = 0;      float PID_Percent = 0.0;
@@ -70,7 +72,6 @@ float constant_F = 4500000.0;
 float constant_T = 0.3;
 unsigned long time = 0;
 float print_time = 0;
-int state = 0;
 int startup = 1;
 byte byte_read;
 
