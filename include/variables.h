@@ -13,7 +13,6 @@ int previousState = 1;
 
 // Motor
 int motorSetPosition = 0.0;
-int motorSetPositionMin;
 int motorSetPositionMax;
 AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
 // Temperature
