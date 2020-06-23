@@ -33,6 +33,5 @@
       Settling time (number of samples) and data filtering can be adjusted in the HX711_ADC.h file
 
       //-------------------------------------------------------------------------------------
-  //-------------------------------------------------------Things to do----------------------------------------------------------------////
 
-      Improve the derivative and integral by using a matrix and integral/derivative techniques learned in numerical methods.
+  //-------------------------------------------------------Things to do----------------------------------------------------------------////
