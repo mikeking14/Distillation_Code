@@ -88,18 +88,18 @@ clear; close all; clc;
         
         %yyaxis left
         ylabel 'Temperature'
-        plot(arduino.Set_Temp/2, '--red')
+        plot(arduino.Set_Temp, '--red')
         plot(arduino.Tower_Temp, '-red')
         legend({'Set Temp','Tower Temp'})
 
         yyaxis right
         ylabel 'PID Variables'
-        ylim([-200 400])
-        %plot(arduino.PID)
+        ylim([-100 300])
+        plot(arduino.PID)
         plot(arduino.PID_Error,'black')
-        %plot(arduino.P, '-m')
-        %plot(arduino.I, '-b')
-        %plot(arduino.D * 100, 'c')
+        plot(arduino.P, '-m')
+        plot(arduino.I, '-b')
+        plot(arduino.D, 'c')
         
-        %legend({'Set Temp','Tower Temp', 'PID', 'PID ERROR','P','I', 'D' },'Location','Northwest')
+        legend({'Set Temp','Tower Temp', 'PID', 'PID ERROR','P','I', 'D' },'Location','Northwest')
 
