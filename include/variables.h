@@ -13,7 +13,11 @@ int previousState = 1;
 
 // Motor
 int motorSetPosition = 0.0;
+int motorStepDistance = 25;
 int motorSetPositionMax;
+boolean motorMaxSetBoolean = false;
+boolean motorMinSetBoolean = false;
+
 AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
 // Temperature
 OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
@@ -48,7 +52,7 @@ int PID_value = 0;
 float kp;   float ki;   float kd;
 //PID Variables
 float PID_p = 0.0;    float PID_i = 100.0;    float PID_d = 0.0;
-int PID_max = 1000;    int PID_min = 0;      float PID_Percent = 0.0;
+int PID_max = 500;    int PID_min = 0;      float PID_Percent = 0.0;
 
 // Frequency
 unsigned long frequency;

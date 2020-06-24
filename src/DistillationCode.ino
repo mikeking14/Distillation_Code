@@ -28,41 +28,32 @@ void setup() {
 void loop() {
 
   time = (millis()) / 1000;
-  //----------------------------------------------------------- Temperature & PID CONTROL ------------------------------------------////
-  calculatePID();
-  setValvePosition();
-
-  //----------------------------------------------------------- Frequency -------------------------------------------------------////
-  getFrequency();
-
-  //----------------------------------------------------------- Load Cell -------------------------------------------------------////
-  getMass();
-
-  //----------------------------------------------------------- Temperarure -------------------------------------------------------////
-  getTemp();
-  temperatureIncrementer();
-
-  //----------------------------------------------------------- Print Statement -------------------------------------------------------////
-  if(time > print_time + .5){
-    printData();
-  }
-
 
   // State Awareness criteria
     // Initialize
     if(tempTower < warmupTemp) {
-      kp = 15.0;   ki = 1.0;   kd = 1.0;
       state = 0;
+      data();
     }
     // Initialize - Warmup
     else if(warmupTemp < tempTower && tempTower <= (set_temperature - 10.0)) {
-      kp = 8.0;  ki = 1.0;  kd = 10.0;
       state = 1;
+      kp = 8.0;  ki = 1.0;  kd = 10.0;
+      PID_max = 300;
+
+      calculatePID();
+      setValvePosition();
+      data();
+
     }
     // Warmup - Distilation
     else if (tempTower >= (set_temperature - 10.0)) {
-      kp = 5.0;   ki = 2.0;   kd = 10.0;
       state = 2;
+      kp = 5.0;   ki = 2.0;   kd = 10.0;
+
+      calculatePID();
+      setValvePosition();
+      data();
     }
     // Something isnt working
     else {
@@ -79,8 +70,9 @@ void startupSequence() {
       // to measure the temperature for the control system
 
 
-  // Set min flow rate
-  Serial.println("Set MIN flow rate -- 1 for More -- 2 for Less -- 9 to resume: ");
+  // Set min flow rate1
+  Serial.println(); Serial.println();
+  Serial.println("Set Min flow rate -- 1 for More -- 2 for Less -- 3 to set -- 9 to continue: ");
   while(startup == 1){
     if (Serial.available()) {
       // Read the most recent byte from the serial monitor
@@ -90,33 +82,47 @@ void startupSequence() {
       if (byte_read == 1) {
         Serial.print(" More Water ");
         // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != 25) {
+        while(motor.currentPosition() != motorStepDistance) {
           motor.setSpeed(200);
           motor.runSpeed();
           }
+        motor.setCurrentPosition(0); // Make this postion zero
       }
 
       // Close the valve more by pressing 2
-      if (byte_read == 2){
+      else if (byte_read == 2){
         Serial.print(" Less Water ");
         // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != -25) {
+        while(motor.currentPosition() >= - motorStepDistance) {
           motor.setSpeed(-200);
           motor.runSpeed();
           }
+        motor.setCurrentPosition(0); // Make this postion zero
       }
 
       //Set the motor current position to zero and leave setup
-      if(byte_read == 9){
+      else if(byte_read == 3){
         motor.setCurrentPosition(0);
+        motorMinSetBoolean = true;
+        Serial.println();
+        Serial.println("Press 9 to Continue");
+      }
+
+      // Continue to Max Flow rate
+      else if(byte_read == 9 && motorMinSetBoolean == true){
         startup = 2;
-        break;
+      }
+
+      else if(byte_read == 9 && motorMinSetBoolean == false){
+        Serial.println();
+        Serial.println("Press 3 to set MIN flow rate before you continue...");
       }
     }
   }
 
   // Set max flow rate
-  Serial.println("Set MAX flow rate -- 1 for More -- 2 for Less -- 9 to resume: ");
+  Serial.println(); Serial.println();
+  Serial.println("Set MAX flow rate -- 1 for More -- 2 for Less -- 3 to set -- 9 to continue: ");
   while(startup == 2){
     if (Serial.available()) {
       // Read the most recent byte from the serial monitor
@@ -125,31 +131,54 @@ void startupSequence() {
       // Open the valve by pressing 1
       if (byte_read == 1) {
         Serial.print(" More Water ");
-        // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != 25) {
-          motor.setSpeed(200);
-          motor.runSpeed();
-          }
+        motor.moveTo(motor.currentPosition() + motorStepDistance);
+        motor.setSpeed(200);
       }
 
       // Close the valve more by pressing 2
-      if (byte_read == 2){
+      else if (byte_read == 2){
         Serial.print(" Less Water ");
-        // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != -25) {
-          motor.setSpeed(-200);
-          motor.runSpeed();
-          }
+        motor.moveTo(motor.currentPosition() - motorStepDistance);
+        motor.setSpeed(-200);
       }
 
-      //Set the motor current position to zero and leave setup
-      if(byte_read == 9){
-        motorSetPositionMax = motor.currentPosition()
+      //Set the motor position
+      else if(byte_read == 3 && motorMaxSetBoolean == false){
+        motorSetPositionMax = motor.currentPosition();
+        motorMaxSetBoolean = true;
+        motor.moveTo(50);
+        motor.setSpeed(-200);
+        initalInfo();
+        Serial.print("Press 9 to continue to the Distilation when the motor finishes moving");
+
+      }
+
+      else if(byte_read == 9 && motorMaxSetBoolean == true){
         startup = 0;
         break;
       }
+
+      else if(byte_read == 9 && motorMaxSetBoolean == false){
+        Serial.println("Press 3 to set MAX flow rate before you continue...");
+
+      }
+      // Move to target posistion
+      while (motor.currentPosition() != motor.targetPosition()) {
+        motor.runSpeedToPosition();
+      }
+
     }
   }
+}
+
+void data() {
+
+  getFrequency();
+  getMass();
+  getTemp();
+  //----------------------------------------------------------- Print Statement -------------------------------------------------------////
+  printData();
+
 }
 
 void printData() {
@@ -175,7 +204,6 @@ void printData() {
   Serial.print("STCnt:");     Serial.print("\t");     Serial.print(set_temp_counter);           Serial.print("\t");
   Serial.print("ChkP:");      Serial.print("\t");     Serial.print(checkpoint);                 Serial.print("\t");
   Serial.print("State:");     Serial.print("\t");     Serial.print(state);                      Serial.print("\t");
-
   Serial.print("kP:");      Serial.print("\t");     Serial.print(kp);                      Serial.print("\t");
   Serial.print("kI");       Serial.print("\t");     Serial.print(ki);                      Serial.print("\t");
   Serial.print("kD:");      Serial.print("\t");     Serial.print(kd);                      Serial.println("\t");
@@ -212,7 +240,19 @@ float getMass() {
   return average_mass;
 }
 
+void getTemp(){
+  // Read the value of temperature probes
+  tempSensors.requestTemperatures();
+  // Store the actual temperature now
+  tempRoom = tempSensors.getTempC(tempR);
+  tempTower =  tempSensors.getTempC(tempT);
+  tempWash = tempSensors.getTempC(tempW);
+  tempOutlet = tempSensors.getTempC(tempO);
+}
+
 void calculatePID() {
+  // Check if we need to increment the temperature
+  temperatureIncrementer();
   //Next we calculate the error between the setpoint and the real value
   PID_error = set_temperature - tempTower;
   storeError(PID_error, millis());
@@ -237,17 +277,17 @@ void calculatePID() {
   //Final total PID value is the sum of P + I + D
   PID_value = PID_p + PID_i + PID_d;
 
-  //We define PID range between 0 and 255
+  // Re-define PID min and max
   if (PID_value < PID_min){
-    PID_value = PID_min ;}
+    PID_min = PID_value;}
   if (PID_value > PID_max){
-    PID_value = PID_max;}
+    PID_max= PID_value;}
 
 }
 
 void setValvePosition() {
     // Calculate the valve position.
-    motorSetPosition = map(PID_value, PID_min, PID_max, 0, motorSetPositionMax);
+    motorSetPosition = map(PID_value, PID_min, PID_max, motorSetPositionMax, 0);
 
   while(motor.currentPosition() > motorSetPosition && motor.currentPosition() > 0) {
     motor.setSpeed(-200); // Less water
@@ -299,16 +339,6 @@ void temperatureIncrementer() {
       }
 }
 
-void getTemp(){
-  // Read the value of temperature probes
-  tempSensors.requestTemperatures();
-  // Store the actual temperature now
-  tempRoom = tempSensors.getTempC(tempR);
-  tempTower =  tempSensors.getTempC(tempT);
-  tempWash = tempSensors.getTempC(tempW);
-  tempOutlet = tempSensors.getTempC(tempO);
-}
-
 float calculateAverage(float input) {
   // subtract the last reading:
   total = total - readings[read_index];
@@ -342,3 +372,19 @@ void storeError(float input, float timeMillis) {
   PID_temperature_error[2] = input;
   derivativeTime[2] = timeMillis;
   }
+
+void initalInfo(){
+  Serial.println(); Serial.println();
+  Serial.println(); Serial.println();
+  Serial.println(); Serial.println();
+  Serial.println(); Serial.println();
+  Serial.println("-------------------------------Initial information-------------------------------");
+  Serial.println();
+  Serial.println("\t"); Serial.print("Motor Set Position MAX:  ");  Serial.print(motorSetPositionMax);
+  Serial.println();
+  Serial.println("---------------------------------------------------------------------------------");
+  Serial.println(); Serial.println();
+  Serial.println(); Serial.println();
+  Serial.println(); Serial.println();
+  Serial.println(); Serial.println();
+}
