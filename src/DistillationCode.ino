@@ -34,9 +34,11 @@ void loop() {
     if(tempTower < warmupTemp) {
       state = 0;
       data();
+      //PID_value = PID_max;
+      //setValvePosition();
     }
     // Initialize - Warmup
-    else if(warmupTemp < tempTower && tempTower <= (set_temperature - 10.0)) {
+    else if(warmupTemp <= tempTower && tempTower <= (set_temperature - 10.0)) {
       state = 1;
       kp = 8.0;  ki = 1.0;  kd = 10.0;
       PID_max = 300;
@@ -57,7 +59,11 @@ void loop() {
     }
     // Something isnt working
     else {
-      Serial.println("Something broke");
+      Serial.println("Something broke");\
+      Serial.println();  Serial.println();  Serial.println();
+      data();
+      delay(5000);
+      Serial.println();  Serial.println();  Serial.println();
     }
 }
 
@@ -150,7 +156,7 @@ void startupSequence() {
         motor.setSpeed(-200);
         initalInfo();
         Serial.print("Press 9 to continue to the Distilation when the motor finishes moving");
-
+        Serial.println(); Serial.println(); Serial.println();
       }
 
       else if(byte_read == 9 && motorMaxSetBoolean == true){

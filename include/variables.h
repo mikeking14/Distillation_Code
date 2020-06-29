@@ -39,7 +39,7 @@ int warmupTemp = 25;
 // Derivative
 float derivativeTime[num_temp_readings];
 
-float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
+float set_temperature = 50.0; //Temperature at which the cooling motor will keep the outlet temperature
 int set_temp_counter = 20;
 int set_temp_counter_Max = 50;
 float PID_error = 0;
