@@ -62,7 +62,7 @@ HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
 long t;
 float mass = 0.0;
 float average_mass = 0.0;
-float derivative_mass = 0.0;
+float mass_derivative = 0.0;
 float prev_mass = 0.0;
 float min_mass_derivative = 0.1;
 int checkpoint_const = 10000;

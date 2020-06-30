@@ -40,7 +40,7 @@ void loop() {
     // Initialize - Warmup
     else if(warmupTemp <= tempTower && tempTower <= (set_temperature - 10.0)) {
       state = 1;
-      kp = 8.0;  ki = 1.0;  kd = 10.0;
+      kp = 15;  ki = 1.0;  kd = 10.0;
       PID_max = 300;
 
       calculatePID();
@@ -49,9 +49,9 @@ void loop() {
 
     }
     // Warmup - Distilation
-    else if (tempTower >= (set_temperature - 10.0)) {
+    else if (tempTower >= (set_temperature - 10.0) && checkpoint != checkpoint_const) {
       state = 2;
-      kp = 5.0;   ki = 2.0;   kd = 10.0;
+      kp = 10.0;   ki = 2.0;   kd = 10.0;
 
       calculatePID();
       setValvePosition();
@@ -155,8 +155,6 @@ void startupSequence() {
         motor.moveTo(50);
         motor.setSpeed(-200);
         initalInfo();
-        Serial.print("Press 9 to continue to the Distilation when the motor finishes moving");
-        Serial.println(); Serial.println(); Serial.println();
       }
 
       else if(byte_read == 9 && motorMaxSetBoolean == true){
@@ -204,7 +202,7 @@ void printData() {
   Serial.print("Out°:");      Serial.print("\t");     Serial.print(tempOutlet);                 Serial.print("\t");
   Serial.print("T°:");        Serial.print("\t");     Serial.print(tempTower);                  Serial.print("\t");
   Serial.print("M: ");        Serial.print("\t");     Serial.print(mass);                       Serial.print("\t");
-  Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(derivative_mass);            Serial.print("\t");
+  Serial.print("ΔM: ");       Serial.print("\t");     Serial.print(mass_derivative);            Serial.print("\t");
   Serial.print("F:");         Serial.print("\t");     Serial.print(frequency);                  Serial.print("\t"); //20ms sample in H
   Serial.print("ST:");        Serial.print("\t");     Serial.print(set_temperature);            Serial.print("\t");
   Serial.print("STCnt:");     Serial.print("\t");     Serial.print(set_temp_counter);           Serial.print("\t");
@@ -234,7 +232,7 @@ float getMass() {
   average_mass = calculateAverage(mass);
   elapsed_time2 = (t - time_prev2) / 1000;
   if (elapsed_time2 > 1) {
-    derivative_mass = (average_mass - prev_mass) / elapsed_time2;
+    mass_derivative = (average_mass - prev_mass) / elapsed_time2;
     time_prev2 = t;
     prev_mass = average_mass;
   }
@@ -311,15 +309,15 @@ void temperatureIncrementer() {
       //Increment the tower temperature if the mass flow rate falls below a certain level
       if(set_temp_counter == 0 && checkpoint == checkpoint_const){
         checkpoint = time + checkpoint_increment;
-        min_mass_derivative = 0.25;
+        min_mass_derivative = 0.15;
         //checkpoint = time;
       }
-      // Checks every second to see if the mass rate is too slow (min_mass_derivative). If derivative_mass < min_mass_derivative then it increments a counter.
+      // Checks every second to see if the mass rate is too slow (min_mass_derivative). If mass_derivative < min_mass_derivative then it increments a counter.
       // If the counter is above 30 at our checkpoint then increment the setTemp.
       elapsed_time3 = (time - time_prev3);
       if(elapsed_time3 >= 1) {
         time_prev3 = time;
-        if(derivative_mass < min_mass_derivative){
+        if(mass_derivative < min_mass_derivative){
           //Only increment if distillation has started
           set_temp_counter += 1;
           //Keep the counter at the max level
@@ -391,6 +389,6 @@ void initalInfo(){
   Serial.println("---------------------------------------------------------------------------------");
   Serial.println(); Serial.println();
   Serial.println(); Serial.println();
-  Serial.println(); Serial.println();
+  Serial.println("Press 9 to continue to the Distilation when the motor finishes moving");
   Serial.println(); Serial.println();
 }
