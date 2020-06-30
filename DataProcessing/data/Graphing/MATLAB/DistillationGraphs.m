@@ -1,6 +1,6 @@
 clear; close all; clc;
 %% Initialize Workspace
-        runNumber = 41;
+        runNumber = 42;
 
 %% Import Arduino Data
         
@@ -34,7 +34,7 @@ clear; close all; clc;
     DMM_Timetable = retime(DMM_Timetable,'secondly','mean');
     
     % Synchronize the two data steams into a timetable called data
-    data = synchronize(arduino_Timetable,DMM_Timetable, 'union', 'linear');
+    data = synchronize(arduino_Timetable,DMM_Timetable,'union', 'linear');
     
     % Combine mass
     mass = data.Mass;
@@ -61,7 +61,7 @@ clear; close all; clc;
     tower_Temp_Med_Smooth = smoothdata(data.Tower_Temp, 'movmedian', 5);
     tower_Temp_Smooth = smoothdata(tower_Temp_Med_Smooth, 'movmean', 10);
 
-    wash_Temp_Med_Smooth = smoothdata(data.Wash_Temp, 'movmedian', 5);
+    wash_Temp_Med_Smooth = smoothdata(data.Room_Temp, 'movmedian', 5);
     wash_Temp_Smooth = smoothdata(wash_Temp_Med_Smooth, 'movmean', 10);
 
     outlet_Temp_Med_Smooth = smoothdata(data.Outlet_Temp, 'movmedian', 15);
@@ -89,9 +89,9 @@ clear; close all; clc;
             yyaxis right
             ylim([-10 120]);
             ylabel 'Y'
-            plot(resistivity_Smooth / 5000, 'g')
+            plot(resistivity_Smooth / 12000, 'g')
             plot(data.Mass/50, '-m')
-            plot(data.SetTemp, '--r')
+            plot(data.Set_Temp, '--r')
             plot(data.Tower_Temp, '-r')
             plot(wash_Temp_Smooth, '-c')
             plot(outlet_Temp_Smooth, '-k')

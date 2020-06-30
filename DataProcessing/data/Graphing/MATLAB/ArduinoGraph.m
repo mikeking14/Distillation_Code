@@ -1,6 +1,6 @@
 clear; close all; clc;
 %% Initialize Workspace
-        runNumber = 41;
+        runNumber = 42;
 
 %% Import Arduino Data
         
@@ -85,21 +85,30 @@ clear; close all; clc;
         title 'PID CONTROL'
         xlabel 'Time'
         
+
         
-        %yyaxis left
+        yyaxis left
         ylabel 'Temperature'
         plot(arduino.Set_Temp/2, '--red')
         plot(arduino.Tower_Temp, '-red')
-        legend({'Set Temp','Tower Temp'})
-
+        plot(arduino.State*20, '--blue')
+        x=1:size(arduino);
+        y=50;
+        plot(x,y*ones(size(x)))
+        
+        
+        
         yyaxis right
         ylabel 'PID Variables'
         ylim([-200 400])
-        %plot(arduino.PID)
-        plot(arduino.PID_Error,'black')
+        
+        plot(arduino.PID)
+        %plot(arduino.PID_Error,'black')
         %plot(arduino.P, '-m')
         %plot(arduino.I, '-b')
         %plot(arduino.D * 100, 'c')
         
-        %legend({'Set Temp','Tower Temp', 'PID', 'PID ERROR','P','I', 'D' },'Location','Northwest')
+        
+        
+        legend({'Set Temp','Tower Temp', 'State', 'Line', 'PID', 'PID ERROR','P','I' }, 'Location', 'Northwest')
 
