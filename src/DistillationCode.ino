@@ -40,7 +40,7 @@ void loop() {
     // Initialize - Warmup
     else if(warmupTemp <= tempTower && tempTower <= (set_temperature - 10.0)) {
       state = 1;
-      kp = 15;  ki = 1.0;  kd = 10.0;
+      kp = 8.0;  ki = 1.0;  kd = 10.0;
       PID_max = 300;
 
       calculatePID();
@@ -49,9 +49,9 @@ void loop() {
 
     }
     // Warmup - Distilation
-    else if (tempTower >= (set_temperature - 10.0) && checkpoint != checkpoint_const) {
+    else if (tempTower >= (set_temperature - 10.0)) {
       state = 2;
-      kp = 10.0;   ki = 2.0;   kd = 10.0;
+      kp = 8.0;   ki = 0.5;   kd = 5.0;
 
       calculatePID();
       setValvePosition();
@@ -155,6 +155,8 @@ void startupSequence() {
         motor.moveTo(50);
         motor.setSpeed(-200);
         initalInfo();
+        Serial.print("Press 9 to continue to the Distilation when the motor finishes moving");
+        Serial.println(); Serial.println(); Serial.println();
       }
 
       else if(byte_read == 9 && motorMaxSetBoolean == true){
@@ -263,7 +265,7 @@ void calculatePID() {
   //Calculate the P value
   PID_p = kp * PID_error;
   //Calculate the I value in a range on +-5
-  if (-5 < PID_error && PID_error < 5){
+  if (-10 < PID_error && PID_error < 10){
       PID_i = PID_i + (ki * PID_error);
       if (PID_i > 300){
         PID_i = 300;}
@@ -389,6 +391,6 @@ void initalInfo(){
   Serial.println("---------------------------------------------------------------------------------");
   Serial.println(); Serial.println();
   Serial.println(); Serial.println();
-  Serial.println("Press 9 to continue to the Distilation when the motor finishes moving");
+  Serial.println(); Serial.println();
   Serial.println(); Serial.println();
 }
