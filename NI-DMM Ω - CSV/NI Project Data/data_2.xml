@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SourceFile Checksum="B7F320059EEF23A9B5AA1291C498DE89DD8EC698CB54A6039518B2E2E008E16C15EC409E18B051DE9D212CB889D84C419D799771AE42278A596E8EA654F33119" Timestamp="1D639629E61DDF3" xmlns="http://www.ni.com/PlatformFramework">
+	<SourceModelFeatureSet>
+		<ParsableNamespace AssemblyFileVersion="7.1.0.50148" FeatureSetName="Data" Name="http://www.ni.com/Data" OldestCompatibleVersion="6.2.0.0" Version="6.2.0.49152" />
+		<ParsableNamespace AssemblyFileVersion="7.1.0.50148" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="7.1.0.49153" Version="7.1.0.49153" />
+		<ApplicationVersionInfo Build="7.1.0.50148" Name="LabVIEW NXG" Version="4.0.0" />
+	</SourceModelFeatureSet>
+	<DataIndexDefinition xmlns="http://www.ni.com/Data" />
+	<EnvoyManagerFile Id="b8ee60dfca69465fa5a2828f970d09ee" xmlns="http://www.ni.com/PlatformFramework">
+		<EnvoyManagerRootEnvoy Id="2e39c224814047c2a26c972d48e990a7" ModelDefinitionType="EnvoyManagerRootEnvoy" Name="RootEnvoy" />
+		<NameScopingEnvoy AutomaticallyResolveUp="True" Id="3905d16cf712427684517dca0d2ea35f" Name="data_2.xml" NameTracksFileName="True">
+			<EmbeddedDefinitionReference Id="848762a34a384d0c9463844d386fb360" ModelDefinitionType="TDMSRootDefinition" Name="TDMS_Root_2">
+				<TDMSRootDefinition StoragePath="Data-2020-05-28 180151 008.tdms" xmlns="http://www.ni.com/Data" />
+				<EmbeddedDefinitionReference Id="348b31951ab749c48fa4b53861cd3be4" ModelDefinitionType="TDMSGroupDefinition" Name="TDMS_GROUP">
+					<TDMSGroupDefinition GroupName="Capture 1" Source="NI-DMM Continuously Acquire And Chart Multiple Samples.gvi" SourceType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Timestamp="05/28/2020 18:01:51" xmlns="http://www.ni.com/Data" />
+					<EmbeddedDefinitionReference Id="ef3fc43b6ad54ab2b6e7d20e8eb6d0f3" ModelDefinitionType="TDMSDataItemDefinition" Name="Resource Name">
+						<TDMSDataItemDefinition DataName="Resource Name" DataType=":UDR:TagRefnum|NI::DMM::niDMM.udr::niDMM|niaggregate://path/ref:%2f%2fni%2fdmm%2fdmm-src%2f4.0.0/file:%2f%2fdmm.gcomp%5cdmm.gcomp/file:%2f%2fnidmm.udr" xmlns="http://www.ni.com/Data" />
+					</EmbeddedDefinitionReference>
+					<EmbeddedDefinitionReference Id="cb4cadd06de94eceb479b8c70895f8de" ModelDefinitionType="TDMSDataItemDefinition" Name="Measurement Type">
+						<TDMSDataItemDefinition DataName="Measurement Type" DataType="@bf01859afe51420b881d4fd3a3626ae4" xmlns="http://www.ni.com/Data" />
+					</EmbeddedDefinitionReference>
+					<EmbeddedDefinitionReference Id="b898eab021d24f8da63a77fdefaa868d" ModelDefinitionType="TDMSDataItemDefinition" Name="Range">
+						<TDMSDataItemDefinition DataName="Range" DataType="Int32" xmlns="http://www.ni.com/Data" />
+					</EmbeddedDefinitionReference>
+					<EmbeddedDefinitionReference Id="376fd0694e3941278f09df57bf07ad96" ModelDefinitionType="TDMSDataItemDefinition" Name="Resolution (Digits)">
+						<TDMSDataItemDefinition DataName="Resolution (Digits)" DataType="Double" xmlns="http://www.ni.com/Data" />
+					</EmbeddedDefinitionReference>
+					<EmbeddedDefinitionReference Id="8a867925061748fcadeed77de2b262a8" ModelDefinitionType="TDMSDataItemDefinition" Name="Measurements">
+						<TDMSDataItemDefinition DataName="Measurements" DataType="Double[]" xmlns="http://www.ni.com/Data" />
+					</EmbeddedDefinitionReference>
+					<EmbeddedDefinitionReference Id="d2fa3986feb44a71b3ccfccd4dab152a" ModelDefinitionType="TDMSDataItemDefinition" Name="Run Number">
+						<TDMSDataItemDefinition DataName="Run Number" DataType="String" xmlns="http://www.ni.com/Data" />
+					</EmbeddedDefinitionReference>
+					<EmbeddedDefinitionReference Id="75a5ed4b67e54732af4e3cc6a49c0af9" ModelDefinitionType="TDMSDataItemDefinition" Name="Samples / Second">
+						<TDMSDataItemDefinition DataName="Samples / Second" DataType="Double" xmlns="http://www.ni.com/Data" />
+					</EmbeddedDefinitionReference>
+				</EmbeddedDefinitionReference>
+			</EmbeddedDefinitionReference>
+		</NameScopingEnvoy>
+	</EnvoyManagerFile>
+	<DataTypeReferenceTable xmlns="http://www.ni.com/PlatformFramework">
+		<p.TypeReference TypeId="bf01859afe51420b881d4fd3a3626ae4">
+			<Enumeration>
+				<Members>
+					<EnumerationMember Value="0" Name="DC Volts" />
+					<EnumerationMember Value="1" Name="AC Volts" />
+					<EnumerationMember Value="2" Name="DC Current" />
+					<EnumerationMember Value="3" Name="AC Current" />
+					<EnumerationMember Value="4" Name="2-wire Resistance" />
+					<EnumerationMember Value="5" Name="4-wire Resistance" />
+					<EnumerationMember Value="6" Name="Diode" />
+					<EnumerationMember Value="7" Name="Frequency" />
+					<EnumerationMember Value="8" Name="Period" />
+					<EnumerationMember Value="9" Name="AC Volts DC Coupled" />
+					<EnumerationMember Value="10" Name="Capacitance" />
+					<EnumerationMember Value="11" Name="Inductance" />
+					<EnumerationMember Value="12" Name="Temperature" />
+				</Members>
+				<DataType>UInt16</DataType>
+			</Enumeration>
+		</p.TypeReference>
+	</DataTypeReferenceTable>
+</SourceFile>
