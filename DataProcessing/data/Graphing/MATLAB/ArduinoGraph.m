@@ -1,25 +1,27 @@
 clear; close all; clc;
 %% Initialize Workspace
-        runNumber = 42;
+        runNumber = 43;
 
 %% Import Arduino Data
         
         % Specify Filepath
-        str = "/Users/michaelking/Documents/PlatformIO/Projects/Distillation_Code/DataProcessing/data/Run";
-        str2 = num2str(runNumber);
-        str3 = "/DistillationRun";
-        str4 = "_Arduino.txt";
+                
+        s1 = pwd;
+        s1 = s1(1:size(s1,2)-15);
+        s2 = sprintf('Run%d/DistillationRun%d_Arduino.txt',runNumber,runNumber);
+        Arduinofilename = horzcat(s1,s2);
+        
         
         % Import Arduino data
-        Arduinofilename = append(str,str2,str3,str2,str4);
         arduino = importArduinoFile(Arduinofilename);
         
 
 %% Import DMM Data
        
         % Specify Filepath
-        str5 = "_DMM.txt";
-        DMMfilename = append(str,str2,str3,str2,str5);
+        
+        s2 = sprintf('Run%d/DistillationRun%d_DMM.txt',runNumber,runNumber);
+        DMMfilename = horzcat(s1,s2);
         % Import DMM data
         DMM = importDMMfile(DMMfilename);
        
