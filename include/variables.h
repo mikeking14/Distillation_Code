@@ -3,7 +3,7 @@
 #define stepPin 3 //StepperMotor Stepping pin
 #define motorInterfaceType 1  //StepperMotor Interface Type (1 is for driver)
 #include <OneWire.h>  // Temperature
-#include <DallasTemperature.h>  // Temperarure
+#include <DallasTemperature.h>  // Temperature
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
 #include <FreqCount.h>  // Frequency
 #include <HX711_ADC.h> // Load Cell
@@ -39,7 +39,7 @@ int warmupTemp = 25;
 // Derivative
 float derivativeTime[num_temp_readings];
 
-float set_temperature = 50.0; //Temperature at which the cooling motor will keep the outlet temperature
+float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
 int set_temp_counter = 20;
 int set_temp_counter_Max = 50;
 float PID_error = 0;
