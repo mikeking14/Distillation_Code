@@ -265,7 +265,7 @@ void calculatePID() {
   //Calculate the P value
   PID_p = kp * PID_error;
   //Calculate the I value in a range on +-5
-  if (-10 < PID_error && PID_error < 10){
+  if (-15 < PID_error && PID_error < 15){
       PID_i = PID_i + (ki * PID_error);
       if (PID_i > 300){
         PID_i = 300;}
