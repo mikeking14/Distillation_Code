@@ -1,7 +1,9 @@
 clear; close all; clc;
 %% Initialize Workspace
-    runNumber = 43;
-
+    runNumber = 49;
+    
+    methanol = 320; 
+    IPA = 1259;
 %% Import Arduino Data
         
     % Specify Current Directory      
@@ -49,22 +51,12 @@ clear; close all; clc;
     mass_Med_Smooth = smoothdata(data.Mass, 'movmedian', 30);
     mass_Smooth=smoothdata(mass_Med_Smooth,'movmean',10);
 
-    mass_Rate_Med_Smooth = smoothdata(data.Mass_Delta, 'movmedian', 80);
+    mass_Rate_Med_Smooth = smoothdata(data.Mass_Delta, 'movmedian', 800);
     mass_Rate_Smooth = smoothdata(mass_Rate_Med_Smooth, 'movmean', 60);
 
     %Frequency
     freq_Med_Smooth = smoothdata(data.Frequency, 'movmedian', 10);
     freq_Smooth = smoothdata(freq_Med_Smooth, 'movmean', 30);
-
-    %Temperature
-    tower_Temp_Med_Smooth = smoothdata(data.Tower_Temp, 'movmedian', 5);
-    tower_Temp_Smooth = smoothdata(tower_Temp_Med_Smooth, 'movmean', 10);
-
-    wash_Temp_Med_Smooth = smoothdata(data.Room_Temp, 'movmedian', 5);
-    wash_Temp_Smooth = smoothdata(wash_Temp_Med_Smooth, 'movmean', 10);
-
-    outlet_Temp_Med_Smooth = smoothdata(data.Outlet_Temp, 'movmedian', 15);
-    outlet_Temp_Smooth = smoothdata(outlet_Temp_Med_Smooth, 'movmean', 25);
 
     resistivity_Med_Smooth = smoothdata(data.Resistance, 'movmedian', 20);
     resistivity_Smooth = smoothdata(resistivity_Med_Smooth, 'movmean', 10);
@@ -81,24 +73,33 @@ clear; close all; clc;
         % Left side of graph
             yyaxis left
             ylabel 'Frequency'
-            ylim([126000 134000])
-            plot(freq_Smooth, '-b')
-            
-        % Right side of graph
+            ylim([3000 900000])
+            %plot(freq_Smooth, '-b')
+            plot(resistivity_Smooth, 'g')
+                
+                % Vetical Line where Methanol/IPA to be expected
+                [d,i_IPA] = min( abs( data.Mass-methanol ) );
+                [d,i_H20] = min( abs( data.Mass-IPA) );
+                %xline(i_IPA);
+                %xline(i_H20);
+                            
+            % Right side of graph
             yyaxis right
             ylim([-10 120]);
             ylabel 'Temperature (degrees)'
-            plot(resistivity_Smooth / 12000, 'g')
             plot(data.Mass/50, '-m')
             plot(data.Set_Temp, '--r')
             plot(data.Tower_Temp, '-r')
-            plot(wash_Temp_Smooth, '-c')
-            plot(outlet_Temp_Smooth, '-k')
-            p1 = plot(mass_Rate_Smooth*100, '-b');
-            p1.Color(4) = 0.6;
+            plot(data.Room_Temp, '-c')
+            plot(data.Outlet_Temp, '-k')
+            p1 = plot(mass_Rate_Smooth*100, '-y');
+            p1.Color(4) = 0.8;
+
+            %text(i_IPA,max(data.Tower_Temp+20),'\leftarrow Methanol Gone')
+            %text(i_H20,max(data.Tower_Temp+15),'\leftarrow IPA Gone')
          
         % Legend 
-            legend({'Frequency','Resistivity/1200','Mass/50', 'Set Temp','Tower Temperature', 'Wash Temperature','Outlet Temp','Mass Rate * 100' },'Location','Northwest')
+            legend({'Resistivity', 'Mass/50', 'Set Temp','Tower Temperature', 'Wash Temperature','Outlet Temp','Mass Rate * 100' },'Location','Northeast')
             hold off
 
             
@@ -106,27 +107,28 @@ clear; close all; clc;
 
         figure
         hold on
-        title 'Frequency vs Mass'
+        title '(Resistance + Frequency) vs Mass'
         xlabel 'Mass'
 
         % Left side of graph
             yyaxis left
-            ylabel 'Frequency'
-            ylim([108000 144000])
-            plot(mass_Smooth, freq_Smooth, '-b')
+            ylabel 'Resistivity + Frequency'
+            ylim([100000 200000])
+            plot(mass_Smooth, resistivity_Smooth, '-b')
+            plot(mass_Smooth, freq_Smooth, '-black')
         
         % Right side of graph
             yyaxis right
             ylabel 'Mass / Tower Temp'
             ylim([50 120])
-            plot(mass_Smooth, tower_Temp_Smooth, '-r')
+            plot(mass_Smooth, data.Tower_Temp, '-r')
             
         % Legend
-            legend({'Frequency', 'Tower Temp'},'Location','Northeast')
+            legend({'Resistivity', 'Frequency', 'Tower Temp'},'Location','Northeast')
             hold off
 
             
-%% Resistance Graphs
+%% Resistance Vs Outlet Temp Graphs
 
         figure
         hold on
@@ -147,5 +149,27 @@ clear; close all; clc;
             plot(data.Outlet_Temp, '-r')
             
 legend({'Resistance', 'Outlet Temp'},'Location','Northeast')
+
+
+%% Resistance Graphs Again
+
+        figure
+        hold on
+        title 'All Data'
+        xlabel 'Time'
+        
+        % Left side of graph
+            yyaxis left
+            ylabel 'Resistivity'
+            ylim([0 100000])
+            plot(resistivity_Smooth, 'g')
+            plot(data.Mass*25, '-m')
+
+            [d,i_IPA] = min( abs( data.Mass-320 ) )
+            [d,i_H20] = min( abs( data.Mass-1259) )
+
+            xline(i_IPA)
+            xline(i_H20)
+            yline(0)
 
 
