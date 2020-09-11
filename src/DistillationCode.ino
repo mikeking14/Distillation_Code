@@ -210,10 +210,6 @@ void printData() {
   Serial.print("STCnt:");     Serial.print("\t");     Serial.print(set_temp_counter);           Serial.print("\t");
   Serial.print("ChkP:");      Serial.print("\t");     Serial.print(checkpoint);                 Serial.print("\t");
   Serial.print("State:");     Serial.print("\t");     Serial.print(state);                      Serial.print("\t");
-  Serial.print("kP:");      Serial.print("\t");     Serial.print(kp);                      Serial.print("\t");
-  Serial.print("kI");       Serial.print("\t");     Serial.print(ki);                      Serial.print("\t");
-  Serial.print("kD:");      Serial.print("\t");     Serial.print(kd);                      Serial.println("\t");
-
 
 }
 
