@@ -183,7 +183,10 @@ void data() {
   getMass();
   getTemp();
   //----------------------------------------------------------- Print Statement -------------------------------------------------------////
-  printData();
+  if (time > print_time + 1/data_per_second) {
+    printData();
+  }
+
 
 }
 
@@ -209,7 +212,7 @@ void printData() {
   Serial.print("ST:");        Serial.print("\t");     Serial.print(set_temperature);            Serial.print("\t");
   Serial.print("STCnt:");     Serial.print("\t");     Serial.print(set_temp_counter);           Serial.print("\t");
   Serial.print("ChkP:");      Serial.print("\t");     Serial.print(checkpoint);                 Serial.print("\t");
-  Serial.print("State:");     Serial.print("\t");     Serial.print(state);                      Serial.print("\t");
+  Serial.print("State:");     Serial.print("\t");     Serial.print(state);                      Serial.println("\t");
 
 }
 
