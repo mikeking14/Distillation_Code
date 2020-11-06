@@ -79,6 +79,7 @@ unsigned long time = 0;
 float print_time = 0;
 int startup = 1;
 byte byte_read;
+int data_per_second = 2;
 
 //Averaging Function Variables
 const int num_readings = 10;
