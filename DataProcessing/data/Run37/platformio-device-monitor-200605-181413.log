@@ -1,0 +1,69 @@
+18:14:25.237 > Please Zero the Flow Valve by entering:
+18:14:25.241 > 1 for More water
+18:14:25.245 > 2 for Less water
+18:14:25.245 > Press 9 to resume
+18:14:25.245 >  More Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  Less Water  Less Water  Less Water  More Water  More Water  More Water  More Water  Less Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  More Water  Less Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  Less Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  More Water  Less Water  Less Water  Less Water  Less Water MotorPosition:
+18:30:22.275 > -25
+18:30:22.275 > Startup = 0
+18:30:22.279 > Break
+18:30:22.279 > SetP:	50	CurP:	50	PID ER:	44.63	PID	255	P:	669.38	I:	22.31	D:	1.38	W°:	32.81	Out°:	21.19	M: 	0.01	ΔM: 	0.00	F:	165132	T°:	15.38	ST:,60.00	STCnt:,21	ChkP:,10000
+18:30:23.226 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	44.59	D:	-0.46	W°:	32.81	Out°:	21.06	M: 	0.02	ΔM: 	0.00	F:	165119	T°:	15.44	ST:,60.00	STCnt:,22	ChkP:,10000
+18:30:23.888 > SetP:	50	CurP:	50	PID ER:	44.63	PID	255	P:	669.38	I:	66.91	D:	1.55	W°:	32.81	Out°:	20.81	M: 	0.06	ΔM: 	0.01	F:	165119	T°:	15.38	ST:,60.00	STCnt:,23	ChkP:,10000
+18:30:24.568 > SetP:	50	CurP:	50	PID ER:	44.69	PID	255	P:	670.31	I:	111.56	D:	1.38	W°:	32.81	Out°:	21.25	M: 	0.12	ΔM: 	0.02	F:	165160	T°:	15.31	ST:,60.00	STCnt:,24	ChkP:,10000
+18:30:25.919 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	133.84	D:	-3.23	W°:	32.81	Out°:	21.19	M: 	0.09	ΔM: 	0.02	F:	165160	T°:	15.44	ST:,60.00	STCnt:,25	ChkP:,10000
+18:30:26.603 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	178.44	D:	-1.85	W°:	32.81	Out°:	20.81	M: 	0.06	ΔM: 	0.01	F:	165146	T°:	15.44	ST:,60.00	STCnt:,26	ChkP:,10000
+18:30:27.955 > SetP:	50	CurP:	50	PID ER:	44.63	PID	255	P:	669.38	I:	200.75	D:	1.85	W°:	32.81	Out°:	21.12	M: 	0.05	ΔM: 	0.01	F:	165146	T°:	15.38	ST:,60.00	STCnt:,27	ChkP:,10000
+18:30:28.635 > SetP:	50	CurP:	50	PID ER:	44.63	PID	255	P:	669.38	I:	245.34	D:	1.85	W°:	32.88	Out°:	21.19	M: 	0.12	ΔM: 	0.01	F:	165135	T°:	15.38	ST:,60.00	STCnt:,28	ChkP:,10000
+18:30:29.987 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	267.63	D:	-1.85	W°:	32.88	Out°:	21.12	M: 	0.12	ΔM: 	0.01	F:	165141	T°:	15.44	ST:,60.00	STCnt:,29	ChkP:,10000
+18:30:30.670 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-1.38	W°:	32.88	Out°:	21.12	M: 	0.09	ΔM: 	0.01	F:	165141	T°:	15.50	ST:,60.00	STCnt:,30	ChkP:,10000
+18:30:32.022 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	1.85	W°:	32.81	Out°:	21.25	M: 	0.09	ΔM: 	-0.00	F:	165139	T°:	15.44	ST:,60.00	STCnt:,31	ChkP:,10000
+18:30:32.702 > SetP:	50	CurP:	50	PID ER:	44.69	PID	255	P:	670.31	I:	300.00	D:	2.77	W°:	32.88	Out°:	21.12	M: 	0.09	ΔM: 	0.00	F:	165141	T°:	15.31	ST:,60.00	STCnt:,32	ChkP:,10000
+18:30:34.057 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-5.08	W°:	32.88	Out°:	21.19	M: 	0.11	ΔM: 	0.00	F:	165143	T°:	15.50	ST:,60.00	STCnt:,33	ChkP:,10000
+18:30:34.738 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	1.38	W°:	32.88	Out°:	21.25	M: 	0.08	ΔM: 	0.01	F:	165143	T°:	15.50	ST:,60.00	STCnt:,34	ChkP:,10000
+18:30:35.417 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	5.07	W°:	32.88	Out°:	21.12	M: 	0.03	ΔM: 	-0.01	F:	165140	T°:	15.44	ST:,60.00	STCnt:,35	ChkP:,10000
+18:30:36.769 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	-1.38	W°:	32.88	Out°:	21.19	M: 	-0.01	ΔM: 	-0.01	F:	165140	T°:	15.44	ST:,60.00	STCnt:,36	ChkP:,10000
+18:30:37.453 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	0.00	W°:	32.88	Out°:	21.19	M: 	-0.03	ΔM: 	-0.02	F:	165138	T°:	15.44	ST:,60.00	STCnt:,37	ChkP:,10000
+18:30:38.805 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	0.00	W°:	32.88	Out°:	21.19	M: 	-0.00	ΔM: 	-0.02	F:	165138	T°:	15.44	ST:,60.00	STCnt:,38	ChkP:,10000
+18:30:39.485 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	1.85	W°:	32.88	Out°:	21.12	M: 	-0.01	ΔM: 	-0.02	F:	165149	T°:	15.44	ST:,60.00	STCnt:,39	ChkP:,10000
+18:30:40.840 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	-3.23	W°:	32.88	Out°:	21.31	M: 	-0.02	ΔM: 	-0.02	F:	165149	T°:	15.56	ST:,60.00	STCnt:,40	ChkP:,10000
+18:30:41.521 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	-1.85	W°:	32.88	Out°:	21.25	M: 	-0.04	ΔM: 	-0.02	F:	165151	T°:	15.56	ST:,60.00	STCnt:,41	ChkP:,10000
+18:30:42.872 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	0.46	W°:	32.88	Out°:	21.37	M: 	-0.03	ΔM: 	-0.01	F:	165151	T°:	15.56	ST:,60.00	STCnt:,42	ChkP:,10000
+18:30:43.556 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	0.92	W°:	32.88	Out°:	21.00	M: 	-0.01	ΔM: 	0.00	F:	165157	T°:	15.44	ST:,60.00	STCnt:,43	ChkP:,10000
+18:30:44.907 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-1.85	W°:	32.88	Out°:	21.31	M: 	0.00	ΔM: 	0.00	F:	165161	T°:	15.50	ST:,60.00	STCnt:,44	ChkP:,10000
+18:30:45.587 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-5.54	W°:	32.88	Out°:	20.81	M: 	0.03	ΔM: 	0.00	F:	165154	T°:	15.50	ST:,60.00	STCnt:,45	ChkP:,10000
+18:30:46.940 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	0.00	W°:	32.88	Out°:	21.19	M: 	0.04	ΔM: 	0.01	F:	165166	T°:	15.56	ST:,60.00	STCnt:,46	ChkP:,10000
+18:30:47.622 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-0.46	W°:	32.88	Out°:	21.31	M: 	0.10	ΔM: 	0.02	F:	165152	T°:	15.50	ST:,60.00	STCnt:,47	ChkP:,10000
+18:30:48.974 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	0.00	W°:	32.88	Out°:	21.31	M: 	0.12	ΔM: 	0.02	F:	165153	T°:	15.50	ST:,60.00	STCnt:,48	ChkP:,10000
+18:30:49.655 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-1.85	W°:	32.88	Out°:	21.25	M: 	0.10	ΔM: 	0.02	F:	165150	T°:	15.50	ST:,60.00	STCnt:,49	ChkP:,10000
+18:30:51.010 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	-0.92	W°:	32.88	Out°:	21.06	M: 	0.08	ΔM: 	0.02	F:	165152	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:51.690 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	-1.85	W°:	32.88	Out°:	21.19	M: 	0.06	ΔM: 	0.01	F:	165142	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:53.041 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	0.46	W°:	32.88	Out°:	21.19	M: 	0.04	ΔM: 	0.01	F:	165149	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:53.721 > SetP:	50	CurP:	50	PID ER:	44.56	PID	255	P:	668.44	I:	300.00	D:	2.75	W°:	32.88	Out°:	21.31	M: 	0.06	ΔM: 	0.00	F:	165149	T°:	15.44	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:54.405 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	0.92	W°:	32.88	Out°:	21.12	M: 	0.02	ΔM: 	-0.01	F:	165142	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:55.757 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	1.38	W°:	32.88	Out°:	21.31	M: 	0.01	ΔM: 	-0.01	F:	165142	T°:	15.50	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:56.437 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-1.85	W°:	32.88	Out°:	21.31	M: 	-0.03	ΔM: 	-0.02	F:	165139	T°:	15.50	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:57.793 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	-0.92	W°:	32.88	Out°:	21.25	M: 	-0.01	ΔM: 	-0.02	F:	165139	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:58.474 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	1.38	W°:	32.88	Out°:	21.25	M: 	-0.01	ΔM: 	-0.01	F:	165137	T°:	15.50	ST:,60.00	STCnt:,50	ChkP:,10000
+18:30:59.824 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	-1.85	W°:	32.81	Out°:	21.31	M: 	-0.01	ΔM: 	-0.01	F:	165137	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:00.508 > SetP:	50	CurP:	50	PID ER:	44.31	PID	255	P:	664.69	I:	300.00	D:	-0.92	W°:	32.88	Out°:	21.31	M: 	-0.05	ΔM: 	-0.01	F:	165134	T°:	15.69	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:01.860 > SetP:	50	CurP:	50	PID ER:	44.31	PID	255	P:	664.69	I:	300.00	D:	0.46	W°:	32.88	Out°:	21.37	M: 	-0.03	ΔM: 	-0.01	F:	165134	T°:	15.69	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:02.540 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	2.77	W°:	32.88	Out°:	21.25	M: 	-0.03	ΔM: 	-0.00	F:	165126	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:03.894 > SetP:	50	CurP:	50	PID ER:	44.38	PID	255	P:	665.63	I:	300.00	D:	-2.31	W°:	32.88	Out°:	21.12	M: 	0.00	ΔM: 	-0.00	F:	165135	T°:	15.63	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:04.575 > SetP:	50	CurP:	50	PID ER:	44.31	PID	255	P:	664.69	I:	300.00	D:	-3.23	W°:	32.88	Out°:	21.31	M: 	0.08	ΔM: 	0.01	F:	165124	T°:	15.69	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:05.927 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	5.08	W°:	32.88	Out°:	21.19	M: 	0.07	ΔM: 	0.01	F:	165123	T°:	15.50	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:06.607 > SetP:	50	CurP:	50	PID ER:	44.38	PID	255	P:	665.63	I:	300.00	D:	-0.92	W°:	32.81	Out°:	21.12	M: 	0.17	ΔM: 	0.02	F:	165118	T°:	15.63	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:07.962 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	3.23	W°:	32.88	Out°:	21.06	M: 	0.18	ΔM: 	0.02	F:	165118	T°:	15.50	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:08.642 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	3.69	W°:	32.88	Out°:	21.25	M: 	0.15	ΔM: 	0.03	F:	165120	T°:	15.50	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:09.994 > SetP:	50	CurP:	50	PID ER:	44.50	PID	255	P:	667.50	I:	300.00	D:	-0.92	W°:	32.88	Out°:	21.31	M: 	0.12	ΔM: 	0.02	F:	165120	T°:	15.50	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:10.674 > SetP:	50	CurP:	50	PID ER:	44.25	PID	255	P:	663.75	I:	300.00	D:	-3.69	W°:	32.88	Out°:	21.19	M: 	0.13	ΔM: 	0.02	F:	165116	T°:	15.75	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:12.030 > SetP:	50	CurP:	50	PID ER:	44.31	PID	255	P:	664.69	I:	300.00	D:	2.77	W°:	32.88	Out°:	21.31	M: 	0.13	ΔM: 	0.02	F:	165117	T°:	15.69	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:12.709 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	2.29	W°:	32.88	Out°:	21.19	M: 	0.11	ΔM: 	0.01	F:	165117	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:13.389 > SetP:	50	CurP:	50	PID ER:	44.38	PID	255	P:	665.63	I:	300.00	D:	-1.38	W°:	32.88	Out°:	21.37	M: 	0.08	ΔM: 	-0.01	F:	165118	T°:	15.63	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:14.745 > SetP:	50	CurP:	50	PID ER:	44.44	PID	255	P:	666.56	I:	300.00	D:	1.85	W°:	32.88	Out°:	21.19	M: 	0.08	ΔM: 	-0.01	F:	165118	T°:	15.56	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:15.425 > SetP:	50	CurP:	50	PID ER:	44.38	PID	255	P:	665.63	I:	300.00	D:	-1.38	W°:	32.88	Out°:	21.31	M: 	0.05	ΔM: 	-0.01	F:	165114	T°:	15.63	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:16.777 > SetP:	50	CurP:	50	PID ER:	44.31	PID	255	P:	664.69	I:	300.00	D:	-0.92	W°:	32.88	Out°:	21.25	M: 	0.06	ΔM: 	-0.01	F:	165114	T°:	15.69	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:17.456 > SetP:	50	CurP:	50	PID ER:	44.31	PID	255	P:	664.69	I:	300.00	D:	0.00	W°:	32.88	Out°:	21.31	M: 	0.00	ΔM: 	-0.02	F:	165114	T°:	15.69	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:18.812 > SetP:	50	CurP:	50	PID ER:	44.38	PID	255	P:	665.63	I:	300.00	D:	1.38	W°:	32.81	Out°:	21.31	M: 	-0.03	ΔM: 	-0.02	F:	165114	T°:	15.63	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:19.492 > SetP:	50	CurP:	50	PID ER:	44.38	PID	255	P:	665.63	I:	300.00	D:	1.85	W°:	32.88	Out°:	21.19	M: 	-0.00	ΔM: 	-0.02	F:	165114	T°:	15.63	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:20.844 > SetP:	50	CurP:	50	PID ER:	44.31	PID	255	P:	664.69	I:	300.00	D:	-1.85	W°:	32.88	Out°:	21.19	M: 	0.00	ΔM: 	-0.02	F:	165114	T°:	15.69	ST:,60.00	STCnt:,50	ChkP:,10000
+18:31:21.527 > 
