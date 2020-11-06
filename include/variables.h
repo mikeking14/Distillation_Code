@@ -1,13 +1,15 @@
-#include <AccelStepper.h>
-#define dirPin 2  //StepperMotor Direction pin
-#define stepPin 3 //StepperMotor Stepping pin
-#define motorInterfaceType 1  //StepperMotor Interface Type (1 is for driver)
-#include <OneWire.h>  // Temperature
-#include <DallasTemperature.h>  // Temperature
+#define dirPin 2 // StepperMotor Direction pin
+#define motorInterfaceType 1 // StepperMotor Interface Type (1 is for driver)
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
-#include <FreqCount.h>  // Frequency
-#include <HX711_ADC.h> // Load Cell
+#define stepPin 3 // StepperMotor Stepping pin
 
+#include <AccelStepper.h>
+#include <DallasTemperature.h> // Temperature
+#include <FreqCount.h> // Frequency
+#include <HX711_ADC.h> // Load Cell
+#include <OneWire.h> // Temperature
+
+// State Initialization
 int state = 10;
 int previousState = 1;
 
@@ -19,6 +21,7 @@ boolean motorMaxSetBoolean = false;
 boolean motorMinSetBoolean = false;
 
 AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
+
 // Temperature
 OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 DallasTemperature tempSensors(&oneWire);
@@ -29,8 +32,8 @@ DeviceAddress tempW = {0x28, 0xFF, 0x87, 0x19, 0xA5, 0x16, 0x03, 0x1E};
 DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 
 // PID temperature control
-float tempRoom; float tempTower; float tempWash; float tempOutlet;
-float prevtempRoom; float prevTempTower; float prevTempWash; float prevTempOutlet;
+float tempRoom, tempTower, tempWash, tempOutlet;
+float prevtempRoom, prevTempTower, prevTempWash, prevTempOutlet;
 
 // Store temperature
 const int num_temp_readings = 3;
@@ -39,50 +42,43 @@ int warmupTemp = 25;
 // Derivative
 float derivativeTime[num_temp_readings];
 
-float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
+float set_temperature = 60.0; // Temperature at which the cooling motor will keep the outlet temperature
 int set_temp_counter = 20;
 int set_temp_counter_Max = 50;
 float PID_error = 0;
 float elapsed_time, Time, time_prev;
-float elapsed_time2; float time_prev2 = 0.0;
-float elapsed_time3; float time_prev3 = 0.0;
+float elapsed_time2, time_prev2 = 0.0;
+float elapsed_time3, time_prev3 = 0.0;
 int PID_value = 0;
 
-//PID Constants
-float kp;   float ki;   float kd;
-//PID Variables
-float PID_p = 0.0;    float PID_i = 100.0;    float PID_d = 0.0;
-int PID_max = 500;    int PID_min = 0;      float PID_Percent = 0.0;
+// PID Constants
+float kp, ki;, kd;
+// PID Variables
+float PID_p = 0.0, PID_i = 100.0, PID_d = 0.0;
+int PID_max = 500, PID_min = 0, PID_Percent = 0.0;
 
 // Frequency
 unsigned long frequency;
 
 // Load Cell
-HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
+HX711_ADC LoadCell(8, 9); // HX711 constructor (dout pin, sck pin)
 long t;
-float mass = 0.0;
-float average_mass = 0.0;
-float mass_derivative = 0.0;
-float prev_mass = 0.0;
-float min_mass_derivative = 0.025;
-int checkpoint_const = 10000;
-int checkpoint = checkpoint_const;
-int checkpoint_increment = 100;
-long stabilising_time = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
+float mass = 0.0, average_mass = 0.0, mass_derivative = 0.0, prev_mass = 0.0, min_mass_derivative = 0.025;
+int checkpoint_const = 10000, checkpoint = checkpoint_const, checkpoint_increment = 100;
+long stabilising_time = 5000; // Tare preciscion can be improved by adding a few seconds of stabilising time
 
 // Other
 const int room_temperature_constant = 22;
 float epsilon = 0.0;
-float constant_F = 4500000.0;
-float constant_T = 0.3;
+float constant_F = 4500000.0, constant_T = 0.3;
 unsigned long time = 0;
 float print_time = 0;
 int startup = 1;
 byte byte_read;
 
-//Averaging Function Variables
+// Averaging Function Variables
 const int num_readings = 10;
-float readings[num_readings]; // the readings from the analog input
-int read_index = 0; // the index of the current reading
-float total = 0; // the running total
-float average = 0; // the average
+float readings[num_readings]; // The readings from the analog input
+int read_index = 0; // The index of the current reading
+float total = 0; // The running total
+float average = 0; // The average
