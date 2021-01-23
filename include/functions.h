@@ -124,7 +124,6 @@ void data() {
   getFrequency();
   getMass();
   getTemp();
-  getResistance();
   //----------------------------------------------------------- Print Statement -------------------------------------------------------////
   if (time > print_time + 1/data_per_second) {
     printData();
@@ -164,7 +163,6 @@ void getFrequency() {
     frequency = FreqCount.read();
   }
 }
-
 
 float getMass() {
   // Update() should be called at least as often as HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS
