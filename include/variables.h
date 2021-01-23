@@ -5,11 +5,16 @@
 #include <OneWire.h>  // Temperature
 #include <DallasTemperature.h>  // Temperature
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
-#include <FreqCount.h>  // Frequency
 #include <HX711_ADC.h> // Load Cell
+#include <FreqMeasureMulti.h>
+
 
 int state = 10;
 int previousState = 1;
+
+//Frequencies
+FreqMeasureMulti capacitiveFreq;
+FreqMeasureMulti resistiveFreq;
 
 // Motor
 int motorSetPosition = 0.0;

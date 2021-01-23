@@ -11,7 +11,8 @@ void setup() {
 
   Serial.begin(115200);
   tempSensors.begin();
-  FreqCount.begin(1000);
+  capacitiveFreq.begin(5);
+  resistiveFreq.begin(10);  
   LoadCell.begin();
 
   motor.setMaxSpeed(500);
