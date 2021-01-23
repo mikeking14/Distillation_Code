@@ -1,54 +1,53 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
 {
     "configurations": [
         {
-            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
-        },
-        {
-            "name": "Mac",
-            "macFrameworkPath": [],
+            "name": "PlatformIO",
             "includePath": [
-                "/Users/michaelking/Documents/School/UBCO/Classes/Fourth Year/Capstone/Distillation_Code/include",
-                "/Users/michaelking/Documents/School/UBCO/Classes/Fourth Year/Capstone/Distillation_Code/src",
-                "/Users/michaelking/.platformio/lib/HX711_ADC_ID1900/src",
-                "/Users/michaelking/Documents/School/UBCO/Classes/Fourth Year/Capstone/Distillation_Code/lib/FreqCount",
-                "/Users/michaelking/.platformio/lib/DallasTemperature_ID54",
-                "/Users/michaelking/.platformio/lib/OneWire_ID1",
-                "/Users/michaelking/.platformio/lib/AccelStepper_ID265/src",
-                "/Users/michaelking/.platformio/packages/framework-arduino-avr/cores/arduino",
-                "/Users/michaelking/.platformio/packages/framework-arduino-avr/variants/standard",
-                "/Users/michaelking/.platformio/lib/LiquidCrystal_ID887/src",
-                "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
-                "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/HID/src",
-                "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
-                "/Users/michaelking/.platformio/packages/tool-unity",
+                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/include",
+                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/src",
+                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/HX711_ADC/src",
+                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/lib/FreqCount",
+                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/DallasTemperature",
+                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/OneWire",
+                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/AccelStepper/src",
+                "C:/Users/mikek/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/mikek/.platformio/packages/framework-arduino-avr/variants/standard",
+                "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "C:/Users/mikek/.platformio/packages/tool-unity",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "/Users/michaelking/Documents/School/UBCO/Classes/Fourth Year/Capstone/Distillation_Code/include",
-                    "/Users/michaelking/Documents/School/UBCO/Classes/Fourth Year/Capstone/Distillation_Code/src",
-                    "/Users/michaelking/.platformio/lib/HX711_ADC_ID1900/src",
-                    "/Users/michaelking/Documents/School/UBCO/Classes/Fourth Year/Capstone/Distillation_Code/lib/FreqCount",
-                    "/Users/michaelking/.platformio/lib/DallasTemperature_ID54",
-                    "/Users/michaelking/.platformio/lib/OneWire_ID1",
-                    "/Users/michaelking/.platformio/lib/AccelStepper_ID265/src",
-                    "/Users/michaelking/.platformio/packages/framework-arduino-avr/cores/arduino",
-                    "/Users/michaelking/.platformio/packages/framework-arduino-avr/variants/standard",
-                    "/Users/michaelking/.platformio/lib/LiquidCrystal_ID887/src",
-                    "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
-                    "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/HID/src",
-                    "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                    "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                    "/Users/michaelking/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
-                    "/Users/michaelking/.platformio/packages/tool-unity",
+                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/include",
+                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/src",
+                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/HX711_ADC/src",
+                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/lib/FreqCount",
+                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/DallasTemperature",
+                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/OneWire",
+                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/AccelStepper/src",
+                    "C:/Users/mikek/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "C:/Users/mikek/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "C:/Users/mikek/.platformio/packages/tool-unity",
                     ""
                 ]
             },
             "defines": [
-                "PLATFORMIO=50002",
+                "PLATFORMIO=50004",
                 "ARDUINO_AVR_UNO",
                 "F_CPU=16000000L",
                 "ARDUINO_ARCH_AVR",
@@ -56,10 +55,9 @@
                 "__AVR_ATmega328P__",
                 ""
             ],
-            "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "compilerPath": "/Users/michaelking/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerPath": "C:/Users/mikek/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
             "compilerArgs": [
                 "-mmcu=atmega328p",
                 ""
