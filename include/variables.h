@@ -5,7 +5,7 @@
 #include <OneWire.h>  // Temperature
 #include <DallasTemperature.h>  // Temperature
 #define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
-#include <FreqCount.h>  // Frequency
+#include <FreqMeasureMulti.h>  // Frequency
 #include <HX711_ADC.h> // Load Cell
 
 int state = 10;
@@ -54,8 +54,11 @@ float kp;   float ki;   float kd;
 float PID_p = 0.0;    float PID_i = 100.0;    float PID_d = 0.0;
 int PID_max = 500;    int PID_min = 0;      float PID_Percent = 0.0;
 
-// Frequency
-unsigned long frequency;
+// Frequencies
+FreqMeasureMulti resistanceFreq;
+FreqMeasureMulti capacitanceFreq;
+unsigned long capacitace;
+unsigned long resistance;
 
 // Load Cell
 HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
