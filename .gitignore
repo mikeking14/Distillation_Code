@@ -1,15 +1,6 @@
-# File extensions
 .pio
 .clang_complete
 .gcc-flags.json
 
-# Directories
-.vs/
-.vscode/
-test/
-
-# Files
 .DS_Store
 .DS_Store?
-.travis.yml
-platformio.ini
