@@ -1,12 +1,13 @@
-#include <AccelStepper.h>
-#define dirPin 2  //StepperMotor Direction pin
-#define stepPin 3 //StepperMotor Stepping pin
-#define motorInterfaceType 1  //StepperMotor Interface Type (1 is for driver)
-#include <OneWire.h>  // Temperature
+#include <AccelStepper.h>       // Motor
+#include <OneWire.h>            // Temperature
 #include <DallasTemperature.h>  // Temperature
-#define ONE_WIRE_BUS 12 // Temperature Data wire on pin 13
-#include <FreqMeasureMulti.h>  // Frequency
-#include <HX711_ADC.h> // Load Cell
+#include <FreqMeasureMulti.h>   // Frequency
+#include <HX711_ADC.h>          // Load Cell
+
+#define dirPin 2                //StepperMotor Direction pin
+#define stepPin 3               //StepperMotor Stepping pin
+#define motorInterfaceType 1    //StepperMotor Interface Type (1 is for driver)
+#define ONE_WIRE_BUS 12         // Temperature Data wire on pin 13
 
 int state = 10;
 int previousState = 1;
@@ -15,10 +16,11 @@ int previousState = 1;
 int motorSetPosition = 0.0;
 int motorStepDistance = 25;
 int motorSetPositionMax;
-boolean motorMaxSetBoolean = false;
-boolean motorMinSetBoolean = false;
+boolean motorMaxSet = false;
+boolean motorMinSet = false;
 
 AccelStepper motor = AccelStepper(motorInterfaceType, stepPin, dirPin); // AccelStepper instance for cooling water flow valve
+
 // Temperature
 OneWire oneWire(ONE_WIRE_BUS); // oneWire instance for Maxim/Dallas temperature IC
 DallasTemperature tempSensors(&oneWire);
@@ -51,14 +53,14 @@ int PID_value = 0;
 //PID Constants
 float kp;   float ki;   float kd;
 //PID Variables
-float PID_p = 0.0;    float PID_i = 100.0;    float PID_d = 0.0;
-int PID_max = 500;    int PID_min = 0;      float PID_Percent = 0.0;
+float PID_p = 0.0, PID_i = 100.0, PID_d = 0.0, PID_Percent = 0.0;
+int PID_max = 500, PID_min = 0;
 
 // Frequencies
-FreqMeasureMulti resistanceFreq;
-FreqMeasureMulti capacitanceFreq;
-unsigned long capacitace;
-unsigned long resistance;
+FreqMeasureMulti ResFreqMeas;
+FreqMeasureMulti CapFreqMeas;
+unsigned long capFreq;
+unsigned long resFreq;
 
 // Load Cell
 HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
@@ -80,7 +82,6 @@ float constant_F = 4500000.0;
 float constant_T = 0.3;
 unsigned long time = 0;
 float print_time = 0;
-int startup = 1;
 byte byte_read;
 int data_per_second = 2;
 

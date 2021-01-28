@@ -10,111 +10,106 @@ void calculatePID();
 void setValvePosition();
 void temperatureIncrementer();
 float calculateAverage(float input);
-void initalInfo();
 
-void startupSequence() {
-  // Startup Sequence to Calibrate water flow to near Zero flow:
-      // You will need some flow as the temperature of this water used
-      // to measure the temperature for the control system
-
-
-  // Set min flow rate1
-  Serial.println(); Serial.println();
-  Serial.println("Set Min flow rate -- 1 for More -- 2 for Less -- 3 to set -- 9 to continue: ");
-  while(startup == 1){
-    if (Serial.available()) {
+// Startup Sequence to Calibrate water flow to near Zero flow:
+// You will need some flow as the temperature of this water used
+// to measure the temperature for the control system
+void startupSequence()
+{
+  Serial.println("\n\nPress 1 to -- increase flow.\nPress 2 to -- decrease flow.\nPress 3 to -- set MIN.\nPress 9 to -- continue.");
+  while (!motorMinSet && byte_read != 9)
+  {
+    if (Serial.available())
+    {
       // Read the most recent byte from the serial monitor
-      byte_read = Serial.read()- '0';
+      byte_read = Serial.read() - '0';
 
-      // Open the valve by pressing 1
-      if (byte_read == 1) {
-        Serial.print(" More Water ");
-        // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() != motorStepDistance) {
+      switch (byte_read)
+      {
+      case 1: // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
+        Serial.println("More Water");
+        while (motor.currentPosition() != motorStepDistance)
+        {
           motor.setSpeed(200);
           motor.runSpeed();
-          }
+        }
         motor.setCurrentPosition(0); // Make this postion zero
-      }
+        break;
 
-      // Close the valve more by pressing 2
-      else if (byte_read == 2){
-        Serial.print(" Less Water ");
-        // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
-        while(motor.currentPosition() >= - motorStepDistance) {
+      case 2: // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
+        Serial.println("Less Water");
+        while (motor.currentPosition() >= -motorStepDistance)
+        {
           motor.setSpeed(-200);
           motor.runSpeed();
-          }
+        }
         motor.setCurrentPosition(0); // Make this postion zero
-      }
+        break;
 
-      //Set the motor current position to zero and leave setup
-      else if(byte_read == 3){
+      case 3: // Set the motor current position to zero and leave setup
         motor.setCurrentPosition(0);
-        motorMinSetBoolean = true;
-        Serial.println();
-        Serial.println("Press 9 to Continue");
-      }
+        motorMinSet = true;
+        Serial.println("\nPress 9 to Continue");
+        break;
 
-      // Continue to Max Flow rate
-      else if(byte_read == 9 && motorMinSetBoolean == true){
-        startup = 2;
-      }
+      case 9: // Continue to Max Flow rate
+        if (!motorMinSet)
+          Serial.println("\nPress 3 to set MIN flow rate before you continue...")
+        break;
 
-      else if(byte_read == 9 && motorMinSetBoolean == false){
-        Serial.println();
-        Serial.println("Press 3 to set MIN flow rate before you continue...");
+      default:
+        Serial.println("Invalid Input!");
       }
     }
   }
 
-  // Set max flow rate
-  Serial.println(); Serial.println();
-  Serial.println("Set MAX flow rate -- 1 for More -- 2 for Less -- 3 to set -- 9 to continue: ");
-  while(startup == 2){
-    if (Serial.available()) {
-      // Read the most recent byte from the serial monitor
-      byte_read = Serial.read()- '0';
+  Serial.println("\n\nPress 1 to -- increase flow.\nPress 2 to -- decrease flow.\nPress 3 to -- set MAX.\nPress 9 to -- continue.");
+  while (!motorMaxSet && byte_read != 9)
+  {
+    if (Serial.available())
+    {
+      byte_read = Serial.read() - '0';
 
-      // Open the valve by pressing 1
-      if (byte_read == 1) {
-        Serial.print(" More Water ");
+      switch (byte_read)
+      {
+      case 1: // Run the motor forward at 200 steps/second until the motor reaches 200 steps (0.05 revolutions):
+        Serial.println(" More Water ");
         motor.moveTo(motor.currentPosition() + motorStepDistance);
         motor.setSpeed(200);
-      }
+        break;
 
-      // Close the valve more by pressing 2
-      else if (byte_read == 2){
-        Serial.print(" Less Water ");
+      case 2: // Run the motor forward at -200 steps/second until the motor reaches 200 steps (0.05 revolutions):
+        Serial.println("Less Water");
         motor.moveTo(motor.currentPosition() - motorStepDistance);
         motor.setSpeed(-200);
-      }
+        break;
 
-      //Set the motor position
-      else if(byte_read == 3 && motorMaxSetBoolean == false){
+      case 3: // Set the motor current position as max and leave setup
         motorSetPositionMax = motor.currentPosition();
-        motorMaxSetBoolean = true;
+        motorMaxSet = true;
         motor.moveTo(50);
         motor.setSpeed(-200);
-        initalInfo();
-        Serial.print("Press 9 to continue to the Distilation when the motor finishes moving");
-        Serial.println(); Serial.println(); Serial.println();
-      }
-
-      else if(byte_read == 9 && motorMaxSetBoolean == true){
-        startup = 0;
+        
+        Serial.println("\n\n\n-------------------------------Initial information-------------------------------");
+        Serial.print("Motor Set Position MAX:\t");
+        Serial.println(motorSetPositionMax);
+        Serial.println("---------------------------------------------------------------------------------\n\n\n");
         break;
+
+      case 9:
+        if (!motorMaxSet)
+          Serial.println("\nPress 3 to set MAX flow rate before you continue...");
+        break;
+
+      default:
+        Serial.println("Invalid Input!");
       }
 
-      else if(byte_read == 9 && motorMaxSetBoolean == false){
-        Serial.println("Press 3 to set MAX flow rate before you continue...");
-
-      }
       // Move to target posistion
-      while (motor.currentPosition() != motor.targetPosition()) {
+      while (motor.currentPosition() != motor.targetPosition())
+      {
         motor.runSpeedToPosition();
       }
-
     }
   }
 }
@@ -124,7 +119,7 @@ void data() {
   getFrequency();
   getMass();
   getTemp();
-  //----------------------------------------------------------- Print Statement -------------------------------------------------------////
+  //----------------------------------------------------------- Print Statement -------------------------------------------------------//
   if (time > print_time + 1/data_per_second) {
     printData();
   }
@@ -300,39 +295,16 @@ void temperatureIncrementer() {
 }
 
 float calculateAverage(float input) {
-  // subtract the last reading:
-  total = total - readings[read_index];
-  // read from the sensor:
+  total = total - readings[read_index]; // subtract the last reading
   readings[read_index] = input;
-  // add the reading to the total:
   total = total + readings[read_index];
-  // advance to the next position in the array:
   read_index = read_index + 1;
 
-  // if we're at the end of the array...
   if (read_index >= num_readings) {
-    // ...wrap around to the beginning:
     read_index = 0;
   }
 
   // calculate the average:
   average = total / num_readings;
-  // send it to the computer as ASCII digits
   return average;
-}
-
-void initalInfo(){
-  Serial.println(); Serial.println();
-  Serial.println(); Serial.println();
-  Serial.println(); Serial.println();
-  Serial.println(); Serial.println();
-  Serial.println("-------------------------------Initial information-------------------------------");
-  Serial.println();
-  Serial.println("\t"); Serial.print("Motor Set Position MAX:  ");  Serial.print(motorSetPositionMax);
-  Serial.println();
-  Serial.println("---------------------------------------------------------------------------------");
-  Serial.println(); Serial.println();
-  Serial.println(); Serial.println();
-  Serial.println(); Serial.println();
-  Serial.println(); Serial.println();
 }
