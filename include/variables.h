@@ -1,19 +1,18 @@
-#include <AccelStepper.h>       // Motor
-#include <OneWire.h>            // Temperature
-#include <DallasTemperature.h>  // Temperature
-#include <FreqMeasureMulti.h>   // Frequency
-#include <HX711_ADC.h>          // Load Cell
+#include <AccelStepper.h>      // Motor
+#include <OneWire.h>           // Temperature
+#include <DallasTemperature.h> // Temperature
+#include <FreqMeasureMulti.h>  // Frequency
+#include <HX711_ADC.h>         // Load Cell
+#include <SPI.h>               // Printing
+#include <SD.h>                // Printing
 
-#define dirPin 2                //StepperMotor Direction pin
-#define stepPin 3               //StepperMotor Stepping pin
-#define motorInterfaceType 1    //StepperMotor Interface Type (1 is for driver)
-#define ONE_WIRE_BUS 12         // Temperature Data wire on pin 13
-
-int state = 10;
-int previousState = 1;
+#define dirPin 2             //StepperMotor Direction pin
+#define stepPin 3            //StepperMotor Stepping pin
+#define motorInterfaceType 1 //StepperMotor Interface Type (1 is for driver)
+#define ONE_WIRE_BUS 12      // Temperature Data wire on pin 12
 
 // Motor
-int motorSetPosition = 0.0;
+int motorSetPosition = 0;
 int motorStepDistance = 25;
 int motorSetPositionMax;
 boolean motorMaxSet = false;
@@ -31,63 +30,86 @@ DeviceAddress tempW = {0x28, 0xFF, 0x87, 0x19, 0xA5, 0x16, 0x03, 0x1E};
 DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 
 // PID temperature control
-float tempRoom; float tempTower; float tempWash; float tempOutlet;
-float prevtempRoom; float prevTempTower; float prevTempWash; float prevTempOutlet;
+float tempRoom;
+float tempTower;
+float tempWash;
+float tempOutlet;
+float prevtempRoom;
+float prevTempTower;
+float prevTempWash;
+float prevTempOutlet;
 
 // Store temperature
-const int num_temp_readings = 3;
-float PID_temperature_error[num_temp_readings];
+const int numTemperatureReadings = 3;
+float PID_temperature_error[numTemperatureReadings];
 int warmupTemp = 25;
 // Derivative
-float derivativeTime[num_temp_readings];
+float derivativeTime[numTemperatureReadings];
 
-float set_temperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
-int set_temp_counter = 20;
-int set_temp_counter_Max = 50;
-float PID_error = 0;
-float elapsed_time, Time, time_prev;
-float elapsed_time2; float time_prev2 = 0.0;
-float elapsed_time3; float time_prev3 = 0.0;
-int PID_value = 0;
+float setTemperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
+int setTemperatureCounter = 20;
+int setTemepratureCounterMax = 50;
+float PIDerror = 0;
+float elapsedTime, elapsedTime2, elapsedTime3, currentTime, previousTime;
+float previousTime2 = 0.0;
+float previousTime3 = 0.0;
+int PIDvalue = 0;
 
 //PID Constants
-float kp;   float ki;   float kd;
+float kp, ki, kd;
 //PID Variables
-float PID_p = 0.0, PID_i = 100.0, PID_d = 0.0, PID_Percent = 0.0;
-int PID_max = 500, PID_min = 0;
+float PIDp = 0.0, PIDi = 100.0, PIDd = 0.0, PIDpercent = 0.0;
+int PIDmax = 500, PIDmin = 0;
 
 // Frequencies
-FreqMeasureMulti ResFreqMeas;
-FreqMeasureMulti CapFreqMeas;
-unsigned long capFreq;
-unsigned long resFreq;
+FreqMeasureMulti FreqMultRes;
+FreqMeasureMulti FreqMultCap;
+unsigned long freqRes;
+unsigned long freqCap;
 
 // Load Cell
 HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
 long t;
 float mass = 0.0;
-float average_mass = 0.0;
-float mass_derivative = 0.0;
-float prev_mass = 0.0;
-float min_mass_derivative = 0.025;
-int checkpoint_const = 10000;
-int checkpoint = checkpoint_const;
-int checkpoint_increment = 100;
-long stabilising_time = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
+float massAverage = 0.0;
+float massDerivative = 0.0;
+float massPrevious = 0.0;
+float minMassDerivative = 0.025;
+int checkpointConts = 10000;
+int checkpoint = checkpointConts;
+int checkpointIncrement = 100;
+long stabilisingTime = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
+
+// Print Variables
+char pidStr[128];
+char tempSetStr[64];
+char tempStr[64];
+char massStr[64];
+char freqStr[64];
+char collatedData[128];
+char dataLogTXT[128];
+float printTime = 0;
+int dataPerSecond = 2;
+int runNumber;
+File dataFile;
 
 // Other
-const int room_temperature_constant = 22;
-float epsilon = 0.0;
-float constant_F = 4500000.0;
-float constant_T = 0.3;
+byte userInput;
+const float constantF = 4500000.0;
+const float constantT = 0.3;
+const int roomTemperature = 22;
+char date[128];
+char localTime[128];
+float epsilon = 0.0; // Bad practice, consider non-zero epsilon
 unsigned long time = 0;
-float print_time = 0;
-byte byte_read;
-int data_per_second = 2;
 
-//Averaging Function Variables
-const int num_readings = 10;
-float readings[num_readings]; // the readings from the analog input
-int read_index = 0; // the index of the current reading
-float total = 0; // the running total
-float average = 0; // the average
+// Averaging Function Variables
+const int numReadings = 10;
+float readings[numReadings]; // the readings from the analog input
+int readIndex = 0;           // the index of the current reading
+float total = 0;             // the running total
+float average = 0;           // the average
+
+// Module in use status
+bool useMassModule = false;
+bool useTemperatureModule = false;
