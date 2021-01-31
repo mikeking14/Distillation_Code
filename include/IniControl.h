@@ -3,7 +3,7 @@
 void readSettings();
 void readDefault();
 void getValue(const char *key);
-void setValue(const char* endMarker, const size_t bufferLen, const char* value);
+void setValue(const char *endMarker, const size_t bufferLen, const char *value);
 
 char defaultText[] = "#  This is the default .ini file DO NOT EDIT, changes to this file will be reverted on startup.\n#  This file is checked if the settings.ini file is corrupted or missing.\n#  Changes should be made to settings.ini\n\ndate = 2021:01:31\nlocalTime = 23:59:59\nrunNumber = 1";
 char settingsText[] = "#  User settings\n\ndate = 2021:01:31\nlocalTime = 00:00:00\nrunNumber = 1";
@@ -14,13 +14,17 @@ IniFile defaultINI("default.ini");
 
 void readSettings()
 {
+delay(1000); Serial.println("test1");
     // Restore modifications or deletion of default.ini
-    SD.remove("default.ini");
+    if(SD.exists("defaults.ini"))
+        SD.remove("default.ini");
+delay(1000); Serial.println("test2");
     File iniFile = SD.open("default.ini", FILE_WRITE);
     iniFile.println(defaultText);
     iniFile.close();
+delay(1000); Serial.println("test3");
     // Creates directory for storing data logs if it does not exist
-    if(!SD.exists("DataLogs/"))
+    if (!SD.exists("DataLogs/"))
         SD.mkdir("DataLogs/");
 
     // Check that settings.ini is available
@@ -43,7 +47,7 @@ void readSettings()
 
     // Update values in settings.ini
     char tempVal[3];
-    sprintf(tempVal, "%d", (runNumber+1));
+    sprintf(tempVal, "%d", (runNumber + 1));
     setValue("runNumber", 4, tempVal);
 }
 
@@ -73,7 +77,7 @@ void getValue(const char *key)
     }
 }
 
-void setValue(const char* endMarker, const size_t bufferLen, const char* value)
+void setValue(const char *endMarker, const size_t bufferLen, const char *value)
 {
     static byte ndx = 0;
     char beforeKey[128];
@@ -108,7 +112,8 @@ void setValue(const char* endMarker, const size_t bufferLen, const char* value)
     }
 
     settingsRW.close();
-    SD.remove("settings.ini");
+    if(SD.exists("settings.ini"))
+        SD.remove("settings.ini");
     settingsRW = SD.open("settings.ini", FILE_WRITE);
     settingsRW.println(beforeKey);
     settingsRW.print(endMarker);

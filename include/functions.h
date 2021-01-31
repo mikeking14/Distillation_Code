@@ -115,8 +115,8 @@ void startupSequence()
 
 void data()
 {
-  freqRes = FreqMultRes.available() ? FreqMultRes.read() : -1;
-  freqCap = FreqMultCap.available() ? FreqMultCap.read() : -1;
+  freqRes = FreqMultRes.available() ? FreqMultRes.read() : 0;
+  freqCap = FreqMultCap.available() ? FreqMultCap.read() : 0;
 
   if (useMassModule)
     getMass();

@@ -1,15 +1,15 @@
-#include <AccelStepper.h>      // Motor
-#include <OneWire.h>           // Temperature
-#include <DallasTemperature.h> // Temperature
-#include <FreqMeasureMulti.h>  // Frequency
-#include <HX711_ADC.h>         // Load Cell
-#include <SPI.h>               // Printing
-#include <SD.h>                // Printing
+#include <AccelStepper.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <FreqMeasureMulti.h>
+#include <HX711_ADC.h>
+#include <SPI.h>
+#include <SD.h>
 
-#define dirPin 2             //StepperMotor Direction pin
-#define stepPin 3            //StepperMotor Stepping pin
-#define motorInterfaceType 1 //StepperMotor Interface Type (1 is for driver)
-#define ONE_WIRE_BUS 12      // Temperature Data wire on pin 12
+#define dirPin 20             //StepperMotor Direction pin
+#define stepPin 21            //StepperMotor Stepping pin
+#define motorInterfaceType 22 //StepperMotor Interface Type (1 is for driver)
+#define ONE_WIRE_BUS 23       // Temperature Data wire on pin 12
 
 // Motor
 int motorSetPosition = 0;
@@ -68,7 +68,7 @@ unsigned long freqRes;
 unsigned long freqCap;
 
 // Load Cell
-HX711_ADC LoadCell(8, 9); //HX711 constructor (dout pin, sck pin)
+HX711_ADC LoadCell(2, 3); //HX711 constructor (dout pin, sck pin)
 long t;
 float mass = 0.0;
 float massAverage = 0.0;
