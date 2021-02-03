@@ -14,53 +14,58 @@ IniFile defaultINI("default.ini");
 
 void readSettings()
 {
-delay(1000); Serial.println("test1");
     // Restore modifications or deletion of default.ini
-    if(SD.exists("defaults.ini"))
+    if (SD.exists("default.ini"))
         SD.remove("default.ini");
-delay(1000); Serial.println("test2");
+
     File iniFile = SD.open("default.ini", FILE_WRITE);
     iniFile.println(defaultText);
     iniFile.close();
-delay(1000); Serial.println("test3");
+
     // Creates directory for storing data logs if it does not exist
     if (!SD.exists("DataLogs/"))
         SD.mkdir("DataLogs/");
 
     // Check that settings.ini is available
-    if (!settingsINI.open())
+    if (!settingsINI.open() || !settingsINI.validate(buffer, bufferLen))
     {
         Serial.println("settings.ini failed to open\nAttempting to open default.ini");
         readDefault();
     }
-    //Check settings.ini doesn't have any values too long to read
-    if (!settingsINI.validate(buffer, bufferLen))
+    else
     {
-        Serial.println("ERROR: Buffer overflow in settings.ini\nUsing default.ini");
-        readDefault();
+        // Get values from settings.ini
+        getValue("date");
+        getValue("localTime");
+        getValue("runNumber");
     }
 
-    // Get values from settings.ini
-    getValue("date");
-    getValue("localTime");
-    getValue("runNumber");
-
     // Update values in settings.ini
+    setValue("date", 4, date);
+    setValue("localTime", 4, localTime);
+
     char tempVal[3];
     sprintf(tempVal, "%d", (runNumber + 1));
     setValue("runNumber", 4, tempVal);
+
+    // Set variables based on .ini values
+    sprintf(dataLogTXT, "DATALOGS/run%dData.txt", runNumber);
 }
 
 void readDefault()
 {
+    delay(1000); Serial.println(date);
     defaultINI.getValue(NULL, "date", buffer, bufferLen);
     strcpy(date, buffer);
-
+delay(1000); Serial.println(date);
+delay(1000); Serial.println(localTime);
     defaultINI.getValue(NULL, "localTime", buffer, bufferLen);
     strcpy(localTime, buffer);
-
+delay(1000); Serial.println(localTime);
+delay(1000); Serial.println(runNumber);
     defaultINI.getValue(NULL, "runNumber", buffer, bufferLen);
     runNumber = atoi(buffer);
+    delay(1000); Serial.println(runNumber);
 }
 
 void getValue(const char *key)
@@ -112,13 +117,13 @@ void setValue(const char *endMarker, const size_t bufferLen, const char *value)
     }
 
     settingsRW.close();
-    if(SD.exists("settings.ini"))
+    if (SD.exists("settings.ini"))
         SD.remove("settings.ini");
     settingsRW = SD.open("settings.ini", FILE_WRITE);
     settingsRW.println(beforeKey);
     settingsRW.print(endMarker);
     settingsRW.print(" = ");
     settingsRW.println(value);
-    settingsRW.println(afterKey);
+    settingsRW.print(afterKey);
     settingsRW.close();
 }

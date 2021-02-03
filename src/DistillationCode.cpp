@@ -15,8 +15,8 @@ void setup()
     }
   }
 
-  FreqMultRes.begin(47);
-  FreqMultCap.begin(33);
+  FreqMultRes.begin(2);
+  FreqMultCap.begin(3);
   
   readSettings();
 
