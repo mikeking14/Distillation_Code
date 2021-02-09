@@ -9,7 +9,9 @@
 #define dirPin 20             //StepperMotor Direction pin
 #define stepPin 21            //StepperMotor Stepping pin
 #define motorInterfaceType 22 //StepperMotor Interface Type (1 is for driver)
-#define ONE_WIRE_BUS 23       // Temperature Data wire on pin 12
+#define ONE_WIRE_BUS 23       // Temperature Data wire on pin 23
+#define resFreqPin 28
+#define capFreqPin 29
 
 // Motor
 int motorSetPosition = 0;
@@ -30,51 +32,53 @@ DeviceAddress tempW = {0x28, 0xFF, 0x87, 0x19, 0xA5, 0x16, 0x03, 0x1E};
 DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
 
 // PID temperature control
-float tempRoom;
-float tempTower;
-float tempWash;
-float tempOutlet;
-float prevtempRoom;
-float prevTempTower;
-float prevTempWash;
-float prevTempOutlet;
+double tempRoom;
+double tempTower;
+double tempWash;
+double tempOutlet;
+double prevtempRoom;
+double prevTempTower;
+double prevTempWash;
+double prevTempOutlet;
 
 // Store temperature
 const int numTemperatureReadings = 3;
-float PID_temperature_error[numTemperatureReadings];
+double PID_temperature_error[numTemperatureReadings];
 int warmupTemp = 25;
 // Derivative
-float derivativeTime[numTemperatureReadings];
+double derivativeTime[numTemperatureReadings];
 
-float setTemperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
+double setTemperature = 60.0; //Temperature at which the cooling motor will keep the outlet temperature
 int setTemperatureCounter = 20;
 int setTemepratureCounterMax = 50;
-float PIDerror = 0;
-float elapsedTime, elapsedTime2, elapsedTime3, currentTime, previousTime;
-float previousTime2 = 0.0;
-float previousTime3 = 0.0;
+double PIDerror = 0;
+double elapsedTime, elapsedTime2, elapsedTime3, currentTime, previousTime;
+double previousTime2 = 0.0;
+double previousTime3 = 0.0;
 int PIDvalue = 0;
 
 //PID Constants
-float kp, ki, kd;
+double kp, ki, kd;
 //PID Variables
-float PIDp = 0.0, PIDi = 100.0, PIDd = 0.0, PIDpercent = 0.0;
+double PIDp = 0.0, PIDi = 100.0, PIDd = 0.0, PIDpercent = 0.0;
 int PIDmax = 500, PIDmin = 0;
 
 // Frequencies
 FreqMeasureMulti FreqMultRes;
 FreqMeasureMulti FreqMultCap;
-unsigned long freqRes;
-unsigned long freqCap;
+long freqRes, freqCap;
+double resSum = 0, capSum = 0;
+int resCount = 0, capCount = 0;
+elapsedMillis timeout;
 
 // Load Cell
 HX711_ADC LoadCell(2, 3); //HX711 constructor (dout pin, sck pin)
 long t;
-float mass = 0.0;
-float massAverage = 0.0;
-float massDerivative = 0.0;
-float massPrevious = 0.0;
-float minMassDerivative = 0.025;
+double mass = 0.0;
+double massAverage = 0.0;
+double massDerivative = 0.0;
+double massPrevious = 0.0;
+double minMassDerivative = 0.025;
 int checkpointConts = 10000;
 int checkpoint = checkpointConts;
 int checkpointIncrement = 100;
@@ -88,27 +92,26 @@ char massStr[64];
 char freqStr[64];
 char collatedData[128];
 char dataLogTXT[128];
-float printTime = 0;
-int dataPerSecond = 2;
+unsigned int printPeriod = 1000; // How often to print data to serial.
 int runNumber;
 File dataFile;
 
 // Other
 byte userInput;
-const float constantF = 4500000.0;
-const float constantT = 0.3;
+const double constantF = 4500000.0;
+const double constantT = 0.3;
 const int roomTemperature = 22;
 char date[128];
 char localTime[128];
-float epsilon = 0.0; // Bad practice, consider non-zero epsilon
-unsigned long time = 0;
+double epsilon = 0.0; // Bad practice, consider non-zero epsilon
+long tempTime = 0;
 
 // Averaging Function Variables
 const int numReadings = 10;
-float readings[numReadings]; // the readings from the analog input
-int readIndex = 0;           // the index of the current reading
-float total = 0;             // the running total
-float average = 0;           // the average
+double readings[numReadings]; // the readings from the analog input
+int readIndex = 0;            // the index of the current reading
+double total = 0;             // the running total
+double average = 0;           // the average
 
 // Module in use status
 bool useMassModule = false;

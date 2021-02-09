@@ -42,34 +42,47 @@ void readSettings()
 
     // Update values in settings.ini
     setValue("date", 4, date);
-    setValue("localTime", 4, localTime);
+    setValue("localTime", 9, localTime);
 
     char tempVal[3];
     sprintf(tempVal, "%d", (runNumber + 1));
-    setValue("runNumber", 4, tempVal);
+    setValue("runNumber", 9, tempVal);
 
     // Set variables based on .ini values
-    sprintf(dataLogTXT, "DATALOGS/run%dData.txt", runNumber);
+    sprintf(dataLogTXT, "DATALOGS/run_%d_Data.txt", runNumber);
 }
 
 void readDefault()
 {
-    delay(1000); Serial.println(date);
+    if (!defaultINI.open())
+    {
+        Serial.println("default.ini failed to open\nPlease restart your device.");
+        while (1)
+        {
+            ;
+        }
+    }
+
     defaultINI.getValue(NULL, "date", buffer, bufferLen);
     strcpy(date, buffer);
-delay(1000); Serial.println(date);
-delay(1000); Serial.println(localTime);
+    memset(buffer, 0, bufferLen);
+
     defaultINI.getValue(NULL, "localTime", buffer, bufferLen);
     strcpy(localTime, buffer);
-delay(1000); Serial.println(localTime);
-delay(1000); Serial.println(runNumber);
+    memset(buffer, 0, bufferLen);
+
     defaultINI.getValue(NULL, "runNumber", buffer, bufferLen);
     runNumber = atoi(buffer);
-    delay(1000); Serial.println(runNumber);
+    memset(buffer, 0, bufferLen);
+
+    defaultINI.close();
 }
 
 void getValue(const char *key)
 {
+    if (!settingsINI.open())
+        Serial.println("settings.ini failed to open.");
+
     if (settingsINI.getValue(NULL, key, buffer, bufferLen))
     {
         strcpy(date, buffer);
@@ -80,48 +93,57 @@ void getValue(const char *key)
         defaultINI.getValue(NULL, key, buffer, bufferLen);
         strcpy(date, buffer);
     }
+    settingsINI.close();
 }
 
 void setValue(const char *endMarker, const size_t bufferLen, const char *value)
 {
-    static byte ndx = 0;
+    bool keyFound = false;
+    char keyBuffer[bufferLen];
     char beforeKey[128];
     char afterKey[128];
-    char inputBuffer[bufferLen];
-    bool keyFound = false;
+    size_t count = 0;
     File settingsRW = SD.open("settings.ini", FILE_READ);
 
     while (settingsRW.available() > 0 && !keyFound)
     {
-        settingsRW.read(inputBuffer, bufferLen);
-        if (strcmp(endMarker, inputBuffer))
+        if (count < bufferLen)
         {
-            keyFound = true;
-            settingsRW.readBytesUntil('\n', inputBuffer, 4);
-            settingsRW.read();
+            keyBuffer[count] = settingsRW.read();
+            beforeKey[count] = keyBuffer[count];
+            count++;
         }
         else
         {
-            for (size_t i = 0; i < bufferLen; i++)
-            {
-                beforeKey[ndx + i] = inputBuffer[i];
-            }
-            ndx += bufferLen;
+            for (size_t i = 0; i < bufferLen - 1; i++)
+                {
+                    keyBuffer[i] = keyBuffer[i + 1];
+                }
+                keyBuffer[bufferLen - 1] = settingsRW.read();
+                beforeKey[count] = keyBuffer[bufferLen - 1];
+                count++;
+
+            if (strcmp(endMarker, keyBuffer))
+                keyFound = true;
         }
     }
 
-    ndx = 0;
+    count = 0;
+    settingsRW.readBytesUntil('\n', keyBuffer, bufferLen);
     while (settingsRW.available() > 0)
     {
-        afterKey[ndx] = settingsRW.read();
+        afterKey[count] = settingsRW.read();
+        count++;
     }
-
     settingsRW.close();
+
     if (SD.exists("settings.ini"))
         SD.remove("settings.ini");
+
     settingsRW = SD.open("settings.ini", FILE_WRITE);
-    settingsRW.println(beforeKey);
-    settingsRW.print(endMarker);
+    //settingsRW.println(beforeKey);
+    settingsRW.print(beforeKey);
+    //settingsRW.print(endMarker);
     settingsRW.print(" = ");
     settingsRW.println(value);
     settingsRW.print(afterKey);
