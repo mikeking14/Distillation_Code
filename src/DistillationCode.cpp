@@ -19,28 +19,29 @@ void setup()
   FreqMultRes.begin(resFreqPin);
   FreqMultCap.begin(capFreqPin);
 
-  readSettings();
+  //readSettings();
   // Add labels as first line of log file
-  dataFile = SD.open(dataLogTXT, FILE_WRITE);
-  if (dataFile)
-  {
-    dataFile.println("Motor Set,Motor Pos,PID Err,PID Val,PID P,PID I,PID D,Set Temp (C°),"
-                     "Set Temp Count,Room Temp (C°),Wash Temp (C°),Outlet Temp (C°),"
-                     "Tower Temp (C°),M(kg),ΔM (kg),Checkpoint,Frequency Res (Hz),"
-                     "Frequency Cap (Hz)");
-    dataFile.close();
-  }
-  else
-  {
-    Serial.println("ERROR: failed to open data log file.");
-  }
+  dataFile = SD.open("run01.txt", FILE_WRITE);
+  //if (dataFile)
+  //{
+  dataFile.println("Motor Set,Motor Pos,PID Err,PID Val,PID P,PID I,PID D,Set Temp (C°),"
+                   "Set Temp Count,Room Temp (C°),Wash Temp (C°),Outlet Temp (C°),"
+                   "Tower Temp (C°),M(kg),ΔM (kg),Checkpoint,Frequency Res (Hz),"
+                   "Frequency Cap (Hz)");
+  dataFile.close();
+  //}
+  //else
+  //{
+  //Serial.println("ERROR: failed to open data log file.");
+  //}
 
   if (useTemperatureModule)
   {
     tempSensors.begin();
-    motor.setMaxSpeed(500);
-    motor.setCurrentPosition(0);
-    startupSequence(); // Used to "zero" the cooling water valve
+    tempSensors.setResolution(tempO, 9);
+    // motor.setMaxSpeed(500);
+    // motor.setCurrentPosition(0);
+    // startupSequence(); // Used to "zero" the cooling water valve
   }
 
   if (useMassModule)
@@ -56,41 +57,41 @@ void setup()
 void loop()
 {
   // Initialize
-  if (useTemperatureModule)
-  {
-    if (tempTower < warmupTemp)
-    {
-      // PIDvalue = PIDmax;
-      // setValvePosition();
-    }
-    // Initialize - Warmup
-    else if (warmupTemp <= tempTower && tempTower <= (setTemperature - 10.0))
-    {
-      kp = 8.0;
-      ki = 1.0;
-      kd = 10.0;
-      PIDmax = 300;
+  // if (useTemperatureModule)
+  // {
+  //   if (tempTower < warmupTemp)
+  //   {
+  //     // PIDvalue = PIDmax;
+  //     // setValvePosition();
+  //   }
+  //   // Initialize - Warmup
+  //   else if (warmupTemp <= tempTower && tempTower <= (setTemperature - 10.0))
+  //   {
+  //     kp = 8.0;
+  //     ki = 1.0;
+  //     kd = 10.0;
+  //     PIDmax = 300;
 
-      calculatePID();
-      setValvePosition();
-    }
-    // Warmup - Distilation
-    else if (tempTower >= (setTemperature - 10.0))
-    {
-      kp = 8.0;
-      ki = 0.5;
-      kd = 5.0;
+  //     calculatePID();
+  //     setValvePosition();
+  //   }
+  //   // Warmup - Distilation
+  //   else if (tempTower >= (setTemperature - 10.0))
+  //   {
+  //     kp = 8.0;
+  //     ki = 0.5;
+  //     kd = 5.0;
 
-      calculatePID();
-      setValvePosition();
-    }
-    // Something isn't working
-    else
-    {
-      Serial.println("Something broke!!\n");
-      delay(5000);
-    }
-  }
+  //     calculatePID();
+  //     setValvePosition();
+  //   }
+  //   // Something isn't working
+  //   else
+  //   {
+  //     Serial.println("Something broke!!\n");
+  //     delay(5000);
+  //   }
+  // }
 
   data();
 }

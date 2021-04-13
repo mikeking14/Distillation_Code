@@ -6,12 +6,14 @@
 #include <SPI.h>
 #include <SD.h>
 
-#define dirPin 20             //StepperMotor Direction pin
-#define stepPin 21            //StepperMotor Stepping pin
-#define motorInterfaceType 22 //StepperMotor Interface Type (1 is for driver)
-#define ONE_WIRE_BUS 23       // Temperature Data wire on pin 23
-#define resFreqPin 28
-#define capFreqPin 29
+#define ONE_WIRE_BUS 18 // Temperature Data wire
+#define LOADCELL_DOUT_PIN 19
+#define LOADCELL_SCK_PIN 20
+#define capFreqPin 22
+#define resFreqPin 23
+#define dirPin 30             //StepperMotor Direction pin
+#define stepPin 31            //StepperMotor Stepping pin
+#define motorInterfaceType 32 //StepperMotor Interface Type (1 is for driver)
 
 // Motor
 int motorSetPosition = 0;
@@ -29,7 +31,7 @@ DallasTemperature tempSensors(&oneWire);
 DeviceAddress tempR = {0x28, 0x25, 0x34, 0x94, 0x97, 0x0E, 0x03, 0x5B};
 DeviceAddress tempT = {0x28, 0xB8, 0x3E, 0x94, 0x97, 0x02, 0x03, 0x50};
 DeviceAddress tempW = {0x28, 0xFF, 0x87, 0x19, 0xA5, 0x16, 0x03, 0x1E};
-DeviceAddress tempO = {0x28, 0xFF, 0x2B, 0x9F, 0x83, 0x16, 0x03, 0x99};
+DeviceAddress tempO = {0x28, 0x5B, 0xB3, 0x12, 0x0D, 0x00, 0x00, 0xE6};
 
 // PID temperature control
 double tempRoom;
@@ -67,12 +69,12 @@ int PIDmax = 500, PIDmin = 0;
 FreqMeasureMulti FreqMultRes;
 FreqMeasureMulti FreqMultCap;
 long freqRes, freqCap;
-double resSum = 0, capSum = 0;
-int resCount = 0, capCount = 0;
+long double resSum = 0, capSum = 0;
+long long int resCount = 0, capCount = 0;
 elapsedMillis timeout;
 
 // Load Cell
-HX711_ADC LoadCell(2, 3); //HX711 constructor (dout pin, sck pin)
+HX711_ADC LoadCell(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN); //HX711 constructor
 long t;
 double mass = 0.0;
 double massAverage = 0.0;
@@ -85,13 +87,13 @@ int checkpointIncrement = 100;
 long stabilisingTime = 5000; // tare preciscion can be improved by adding a few seconds of stabilising time
 
 // Print Variables
-char pidStr[128];
-char tempSetStr[64];
-char tempStr[64];
-char massStr[64];
-char freqStr[64];
-char collatedData[128];
-char dataLogTXT[128];
+char pidStr[256];
+char tempSetStr[256];
+char tempStr[256];
+char massStr[256];
+char freqStr[256];
+char collatedData[512];
+char dataLogTXT[512];
 unsigned int printPeriod = 1000; // How often to print data to serial.
 int runNumber;
 File dataFile;
@@ -114,5 +116,5 @@ double total = 0;             // the running total
 double average = 0;           // the average
 
 // Module in use status
-bool useMassModule = false;
-bool useTemperatureModule = false;
+bool useMassModule = true;
+bool useTemperatureModule = true;

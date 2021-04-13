@@ -128,13 +128,14 @@ void data()
 
   if (useMassModule)
     getMass();
-  if (useTemperatureModule)
+
+  if (useTemperatureModule && timeout > printPeriod)
     getTemp();
 
   if (timeout > printPeriod)
     printData();
 }
-
+int point = 0;
 void printData()
 {
   freqRes = (resCount > 0) ? FreqMultRes.countToFrequency(resSum / resCount) : -1;
@@ -154,19 +155,23 @@ void printData()
     Serial.println(freqStr);
   }
 
-  sprintf(collatedData, "%d,%ld,%f,%d,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f,%d,%ld,%ld",
+  sprintf(collatedData, "%d,%ld,%f,%d,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f,%d,%ld,%ld,%d",
           motorSetPosition, motor.currentPosition(), PIDerror, PIDvalue, PIDp, PIDi, PIDd, setTemperature,
-          setTemperatureCounter, tempRoom, tempWash, tempOutlet, tempTower, mass, massDerivative, checkpoint, freqRes, freqCap);
-  dataFile = SD.open(dataLogTXT, FILE_WRITE);
-  if (dataFile)
-  {
-    dataFile.println(collatedData);
-    dataFile.close();
-  }
-  else
-  {
-    Serial.println("ERROR: failed to open data log file.");
-  }
+          setTemperatureCounter, tempRoom, tempWash, tempOutlet, tempTower, mass, massDerivative, checkpoint, freqRes, freqCap, point);
+  dataFile = SD.open("run01.txt", FILE_WRITE);
+
+  //if (dataFile)
+  //{
+  dataFile.println(collatedData);
+  dataFile.close();
+  //}
+  //else
+  //{
+  //Serial.println("ERROR: failed to open data log file.");
+  //}
+
+  Serial.print("Data point: ");
+  Serial.println(point++);
 
   timeout = 0;
   resSum = 0;
@@ -181,7 +186,7 @@ float getMass()
   // Longer delay in sketch will reduce effective sample rate (be carefull with delay() in loop)
   LoadCell.update();
   // Get smoothed value from data set + current calibration factor
-  mass = LoadCell.getData() * -1;
+  mass = LoadCell.getData();
   t = millis();
   // Calculate the mass flow rate
   massAverage = calculateAverage(mass);
@@ -199,6 +204,7 @@ float getMass()
     if (inByte == 't')
       LoadCell.tareNoDelay();
   }
+
   return massAverage;
 }
 
@@ -207,9 +213,9 @@ void getTemp()
   // Read the value of temperature probes
   tempSensors.requestTemperatures();
   // Store the actual temperature now
-  tempRoom = tempSensors.getTempC(tempR);
-  tempTower = tempSensors.getTempC(tempT);
-  tempWash = tempSensors.getTempC(tempW);
+  // tempRoom = tempSensors.getTempC(tempR);
+  // tempTower = tempSensors.getTempC(tempT);
+  // tempWash = tempSensors.getTempC(tempW);
   tempOutlet = tempSensors.getTempC(tempO);
 }
 
