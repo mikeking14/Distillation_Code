@@ -570,6 +570,7 @@ public:
 		laststate = currstate;
 		currstate = p;
 	}
+	void relabelButton(const char *label, uint16_t newFill);
 	bool isPressed() { return currstate; }
 	bool justPressed() { return (currstate && !laststate); }
 	bool justReleased() { return (!currstate && laststate); }

@@ -117,4 +117,5 @@ double average = 0;           // the average
 
 // Module in use status
 bool useMassModule = true;
+bool useMotorModule = false;
 bool useTemperatureModule = true;

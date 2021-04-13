@@ -1,6 +1,4 @@
 #include <Arduino.h>
-#include <SensorControl.h>
-#include <IniControl.h>
 #include <UI.h>
 
 void setup()
@@ -19,29 +17,17 @@ void setup()
   FreqMultRes.begin(resFreqPin);
   FreqMultCap.begin(capFreqPin);
 
-  //readSettings();
-  // Add labels as first line of log file
-  dataFile = SD.open("run01.txt", FILE_WRITE);
-  //if (dataFile)
-  //{
-  dataFile.println("Motor Set,Motor Pos,PID Err,PID Val,PID P,PID I,PID D,Set Temp (C°),"
-                   "Set Temp Count,Room Temp (C°),Wash Temp (C°),Outlet Temp (C°),"
-                   "Tower Temp (C°),M(kg),ΔM (kg),Checkpoint,Frequency Res (Hz),"
-                   "Frequency Cap (Hz)");
-  dataFile.close();
-  //}
-  //else
-  //{
-  //Serial.println("ERROR: failed to open data log file.");
-  //}
-
   if (useTemperatureModule)
   {
     tempSensors.begin();
     tempSensors.setResolution(tempO, 9);
-    // motor.setMaxSpeed(500);
-    // motor.setCurrentPosition(0);
-    // startupSequence(); // Used to "zero" the cooling water valve
+  }
+
+  if (useMotorModule)
+  {
+    motor.setMaxSpeed(500);
+    motor.setCurrentPosition(0);
+    startupSequence(); // Used to "zero" the cooling water valve
   }
 
   if (useMassModule)
@@ -51,7 +37,30 @@ void setup()
     LoadCell.start(stabilisingTime);
   }
 
+  setupUI();
+
   currentTime = millis() / 1000;
+}
+
+void mkDataFile()
+{
+  //readSettings();
+
+  // Add labels as first line of log file
+  sprintf(dataLogTXT, "RUN%d.txt", runNumber);
+  dataFile = SD.open(dataLogTXT, FILE_WRITE);
+  if (dataFile)
+  {
+    dataFile.println("Motor Set,Motor Pos,PID Err,PID Val,PID P,PID I,PID D,Set Temp (C°),"
+                     "Set Temp Count,Room Temp (C°),Wash Temp (C°),Outlet Temp (C°),"
+                     "Tower Temp (C°),M(kg),ΔM (kg),Checkpoint,Frequency Res (Hz),"
+                     "Frequency Cap (Hz)");
+    dataFile.close();
+  }
+  else
+  {
+    Serial.println("ERROR: failed to open data log file.");
+  }
 }
 
 void loop()
@@ -93,5 +102,18 @@ void loop()
   //   }
   // }
 
-  data();
+  UI();
+
+  if (runStarted && runStopped)
+  {
+    runStarted = true;
+    runStopped = false;
+    mkDataFile();
+  }
+
+  if (runStarted && runStopped)
+    runNumber = ++settingsRunNumber;
+  
+  if (runStarted && !runStopped && !runPaused)
+    data();
 }

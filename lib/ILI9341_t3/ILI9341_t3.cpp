@@ -1829,6 +1829,22 @@ void Adafruit_GFX_Button::drawButton(bool inverted)
 	_gfx->print(_label);
 }
 
+void Adafruit_GFX_Button::relabelButton(const char *label, uint16_t newFill)
+{
+	if (newFill == -1)
+		_fillcolor = ILI9341_LIGHTGREY;
+	else
+		_fillcolor = newFill;
+	
+	strncpy(_label, label, 9);
+	_gfx->fillRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, min(_w,_h)/4, _fillcolor);
+	_gfx->drawRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, min(_w,_h)/4, _outlinecolor);
+	_gfx->setCursor(_x - strlen(_label)*3*_textsize, _y-4*_textsize);
+	_gfx->setTextColor(_textcolor);
+	_gfx->setTextSize(_textsize);
+	_gfx->print(label);
+}
+
 bool Adafruit_GFX_Button::contains(int16_t x, int16_t y)
 {
 	if ((x < (_x - _w/2)) || (x > (_x + _w/2))) return false;
