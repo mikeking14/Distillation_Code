@@ -1,72 +1,119 @@
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Libraries and Variables -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
-
 #include <Arduino.h>
-#include <functions.h>
+#include <UI.h>
 
+void setup()
+{
+  Serial.begin(9600);
 
+  if (!SD.begin(BUILTIN_SDCARD))
+  {
+    while (1)
+    {
+      Serial.println("ERROR: SD.begin() failed!\nCheck SD card and restart device.\n");
+      delay(1000);
+    }
+  }
 
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Setup -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+  FreqMultRes.begin(resFreqPin);
+  FreqMultCap.begin(capFreqPin);
 
-void setup() {
+  if (useTemperatureModule)
+  {
+    tempSensors.begin();
+    tempSensors.setResolution(tempO, 9);
+  }
 
-  Serial.begin(115200);
-  tempSensors.begin();
-  FreqCount.begin(1000);
-  LoadCell.begin();
+  if (useMotorModule)
+  {
+    motor.setMaxSpeed(500);
+    motor.setCurrentPosition(0);
+    startupSequence(); // Used to "zero" the cooling water valve
+  }
 
-  motor.setMaxSpeed(500);
-  motor.setCurrentPosition(0);
+  if (useMassModule)
+  {
+    LoadCell.begin();
+    LoadCell.setCalFactor(416.0); // User set calibration factor for HX711 load cell
+    LoadCell.start(stabilisingTime);
+  }
 
-  Time = millis() / 1000;
+  setupUI();
 
-  LoadCell.setCalFactor(416.0); // user set calibration factor for HX711 load cell
-  LoadCell.start(stabilising_time);
-
-  startupSequence(); // used to "zero" the cooling water valve
-
+  currentTime = millis() / 1000;
 }
 
-//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Loop -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-////
+void mkDataFile()
+{
+  //readSettings();
 
-void loop() {
-
-  time = (millis()) / 1000;
-
-  // State Awareness criteria
-    // Initialize
-    if(tempTower < warmupTemp) {
-      state = 0;
-      data();
-      //PID_value = PID_max;
-      //setValvePosition();
-    }
-    // Initialize - Warmup
-    else if(warmupTemp <= tempTower && tempTower <= (set_temperature - 10.0)) {
-      state = 1;
-      kp = 8.0;  ki = 1.0;  kd = 10.0;
-      PID_max = 300;
-
-      calculatePID();
-      setValvePosition();
-      data();
-
-    }
-    // Warmup - Distilation
-    else if (tempTower >= (set_temperature - 10.0)) {
-      state = 2;
-      kp = 8.0;   ki = 0.5;   kd = 5.0;
-
-      calculatePID();
-      setValvePosition();
-      data();
-    }
-    // Something isnt working
-    else {
-      Serial.println("Something broke");\
-      Serial.println();  Serial.println();  Serial.println();
-      data();
-      delay(5000);
-      Serial.println();  Serial.println();  Serial.println();
-    }
+  // Add labels as first line of log file
+  sprintf(dataLogTXT, "RUN%d.txt", runNumber);
+  dataFile = SD.open(dataLogTXT, FILE_WRITE);
+  if (dataFile)
+  {
+    dataFile.println("Motor Set,Motor Pos,PID Err,PID Val,PID P,PID I,PID D,Set Temp (C°),"
+                     "Set Temp Count,Room Temp (C°),Wash Temp (C°),Outlet Temp (C°),"
+                     "Tower Temp (C°),M(kg),ΔM (kg),Checkpoint,Frequency Res (Hz),"
+                     "Frequency Cap (Hz)");
+    dataFile.close();
+  }
+  else
+  {
+    Serial.println("ERROR: failed to open data log file.");
+  }
 }
 
+void loop()
+{
+  // Initialize
+  // if (useTemperatureModule)
+  // {
+  //   if (tempTower < warmupTemp)
+  //   {
+  //     // PIDvalue = PIDmax;
+  //     // setValvePosition();
+  //   }
+  //   // Initialize - Warmup
+  //   else if (warmupTemp <= tempTower && tempTower <= (setTemperature - 10.0))
+  //   {
+  //     kp = 8.0;
+  //     ki = 1.0;
+  //     kd = 10.0;
+  //     PIDmax = 300;
+
+  //     calculatePID();
+  //     setValvePosition();
+  //   }
+  //   // Warmup - Distilation
+  //   else if (tempTower >= (setTemperature - 10.0))
+  //   {
+  //     kp = 8.0;
+  //     ki = 0.5;
+  //     kd = 5.0;
+
+  //     calculatePID();
+  //     setValvePosition();
+  //   }
+  //   // Something isn't working
+  //   else
+  //   {
+  //     Serial.println("Something broke!!\n");
+  //     delay(5000);
+  //   }
+  // }
+
+  UI();
+
+  if (runStarted && runStopped)
+  {
+    runStarted = true;
+    runStopped = false;
+    mkDataFile();
+  }
+
+  if (runStarted && runStopped)
+    runNumber = ++settingsRunNumber;
+  
+  if (runStarted && !runStopped && !runPaused)
+    data();
+}

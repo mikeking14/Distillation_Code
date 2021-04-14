@@ -1,6 +1,14 @@
 .pio
 .clang_complete
 .gcc-flags.json
-
 .DS_Store
 .DS_Store?
+.travis.yml
+.platformio.ini
+*.code-workspace
+platformio.ini
+
+.vscode/
+.vs/
+test/
+.pio/
