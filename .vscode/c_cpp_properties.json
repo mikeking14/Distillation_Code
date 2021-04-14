@@ -8,13 +8,9 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/include",
-                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/src",
-                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/HX711_ADC/src",
-                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/lib/FreqCount",
-                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/DallasTemperature",
-                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/OneWire",
-                "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/AccelStepper/src",
+                "C:/Users/mikek/OneDrive/Documents/GitHub/Distillation_Code/include",
+                "C:/Users/mikek/OneDrive/Documents/GitHub/Distillation_Code/src",
+                "C:/Users/mikek/OneDrive/Documents/GitHub/Distillation_Code/lib/FreqCount",
                 "C:/Users/mikek/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/mikek/.platformio/packages/framework-arduino-avr/variants/standard",
                 "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
@@ -28,13 +24,9 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/include",
-                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/src",
-                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/HX711_ADC/src",
-                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/lib/FreqCount",
-                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/DallasTemperature",
-                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/OneWire",
-                    "c:/Users/mikek/OneDrive/Desktop/Distillation_Code/.pio/libdeps/uno/AccelStepper/src",
+                    "C:/Users/mikek/OneDrive/Documents/GitHub/Distillation_Code/include",
+                    "C:/Users/mikek/OneDrive/Documents/GitHub/Distillation_Code/src",
+                    "C:/Users/mikek/OneDrive/Documents/GitHub/Distillation_Code/lib/FreqCount",
                     "C:/Users/mikek/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/mikek/.platformio/packages/framework-arduino-avr/variants/standard",
                     "C:/Users/mikek/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
@@ -47,7 +39,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50004",
+                "PLATFORMIO=50101",
                 "ARDUINO_AVR_UNO",
                 "F_CPU=16000000L",
                 "ARDUINO_ARCH_AVR",
@@ -57,7 +49,7 @@
             ],
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "compilerPath": "C:/Users/mikek/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerPath": "avr-gcc",
             "compilerArgs": [
                 "-mmcu=atmega328p",
                 ""
